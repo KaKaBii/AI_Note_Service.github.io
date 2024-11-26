@@ -5,12 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>語音轉文字系統</title>
     <link rel="stylesheet" href="../static/css/style.css">
+
+    <style>
+        .name {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            margin-bottom: 10px;
+            display: none; /* 初始隱藏按鈕列表 */
+        }
+
+        .name button {
+            margin: 5px;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+
+        .name button:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
     <header>
-        <div class="header-left">
-            <img src="../static/images//profile/01.png" sizes="(max-width: 1px) 5vw, 1px" alt="頭像" class="avatar">
-            <span>林阿伯</span>
+        <div class="content-wrapper">
+            <img src="../static/images/profile/01.png" sizes="(max-width: 1px) 5vw, 1px" alt="頭像" class="avatar">
+            <!-- 點擊此名稱觸發按鈕列表顯示/隱藏 -->
+            <div class="toggle-header" onclick="toggleButtons()">林阿伯</div>
+            <!-- 按鈕列表 -->
+            <div class="name" id="buttonList">
+                <button>林阿伯1</button>
+                <button>林阿伯2</button>
+                <button>林阿伯3</button>
+            </div>
         </div>
     </header>
     <main>
@@ -23,5 +55,17 @@
         </div>
     </main>
     <script src="../static/js/index.js"></script>
+    <script>
+        // JavaScript 用於切換按鈕列表的顯示/隱藏
+        function toggleButtons() {
+            const buttonList = document.getElementById('buttonList');
+            if (buttonList.style.display === 'none' || buttonList.style.display === '') {
+                buttonList.style.display = 'flex'; // 顯示按鈕列表
+                buttonList.style.flexDirection = 'column'; // 垂直排列按鈕
+            } else {
+                buttonList.style.display = 'none'; // 隱藏按鈕列表
+            }
+        }
+    </script>
 </body>
 </html>
