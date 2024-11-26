@@ -15,12 +15,27 @@ header {
   padding: 10px 20px;
   font-size: 16px;
   cursor: pointer;
+  border-radius: 4px;
+  border: none;    
+  width: 150px; /* 固定按鈕寬度 */
+  height: 50px; /* 固定按鈕高度 */
+  text-align: center; /* 文字水平居中 */
+  background-color: #e0e0e0; /* 一般按鈕背景色 */
+}
+.btn:hover {
+	background-color: #afafaf;
 }
 .green {
   background-color: #28a745;
   color: white;
 }
+.green:hover{
+	background-color: #218838;
+}
 .orange {
   background-color: #fd7e14;
   color: white;
+}
+.orange:hover{
+	background-color: #d3660d;
 }
