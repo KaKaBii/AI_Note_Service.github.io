@@ -9,6 +9,16 @@ header {
   padding: 10px;
   text-align: center;
 }
+
+.section {
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  margin-bottom: 10px;  
+  display: flex;
+}
+
 .btn {
   display: block;
   margin: 10px auto;
