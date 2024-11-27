@@ -12,24 +12,21 @@
     </header>
     <main>
         <div class="section">
-            <div class="content-display">
-                <h2>分類後文本：</h2>
-                <div id="classified-text">此處顯示分類內容。</div>
-            </div>
+            <h2>分類後文本</h2>
+            <div class="classified-text" id="classified-text1">此處顯示分類內容。</div>
         </div>
         <div class="section">
-            <div class="content-display">
-                <h2>重點整理：</h2>
-                <div id="focused-text">此處顯示重點。</div>
-            </div>
+            <h2>重點整理</h2>
+            <div class="focused-text" id="focused-text1">此處顯示重點。</div>
         </div>
         <div class="section">
-            <div class="input-display">
-                <h2>輸入文字：</h2>
-                <textarea id="input-text" placeholder="點擊輸入文字"></textarea>
-            </div>
+            <h2>輸入文字</h2>
+            <textarea class="input-text" id="input-text" placeholder="點擊輸入文字"></textarea>
         </div>
-        <button onclick="goBack()" class="btn">返回</button>
+        <div class="controls">
+            <button onclick="goBack()" class="btn">返回</button>
+        </div>
+        
     </main>
     <script src="../static/js/content.js"></script>
 </body>

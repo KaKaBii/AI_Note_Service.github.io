@@ -1,170 +1,311 @@
+/* 全局樣式 */
 body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+  font-family: Arial, sans-serif; /* 設定全站的字體為 Arial 或其他無襯線字體 */
+  margin: 0; /* 移除預設的外邊距 */
+  padding: 0; /* 移除預設的內邊距 */
+  box-sizing: border-box; /* 設定盒模型為 border-box，使 padding 和 border 包含在元素總寬度內 */
 }
+
+/* 頁首樣式 */
 header {
-  background-color: #f8f9fa;
-  padding: 10px;
-  text-align: center;
+  background-color: #f8f9fa; /* 設定頁首背景色 */
+  padding: 10px; /* 設定內邊距 */
+  text-align: center; /* 文字置中 */
 }
 
+/* 切換頭部的樣式 */
 .toggle-header {
-  cursor: pointer;
-  background-color: #e79b28;
-  color: white;
-  padding: 15px;
-  margin-bottom: 10px;
-  margin-right: 10px;
-  border-radius: 4px;
-  user-select: none;
-  font-weight: bold;
+  cursor: pointer; /* 滑鼠變成手型，表示可點擊 */
+  color: white; /* 文字顏色為白色 */
+  padding: 15px; /* 設定內邊距 */
+  margin-bottom: 10px; /* 下方外邊距 */
+  margin-right: 10px; /* 右側外邊距 */
+  border-radius: 4px; /* 設定圓角 */
+  user-select: none; /* 禁止文字被選取 */
+  font-weight: bold; /* 文字加粗 */
 }
 
-.toggle-header:hover {
-  background-color: #e36826;
+/* 控制區域的樣式 */
+.controls {
+  display: flex; /* 使用彈性盒模型 */
+  justify-content: center; /* 主軸置中對齊 */
+  align-items: center; /* 交叉軸置中對齊 */
+  gap: 10px; /* 設定子元素之間的間隔 */
+  margin-top: 20px; /* 上方外邊距 */
 }
 
+/* 控制區域內按鈕的樣式 */
+.controls .btn {
+  padding: 10px 20px; /* 設定內邊距 */
+  font-size: 1em; /* 設定字體大小 */
+  border-radius: 5px; /* 設定圓角 */
+  border: none; /* 移除邊框 */
+  cursor: pointer; /* 滑鼠變成手型 */
+}
+
+/* 一般按鈕的樣式 */
 .btn {
-  display: block;
-  padding: 10px 20px;
-  font-size: 16px;
-  cursor: pointer;
-  border-radius: 4px;
-  border: none;    
+  display: block; /* 設定為塊級元素 */
+  padding: 10px 20px; /* 設定內邊距 */
+  font-size: 16px; /* 設定字體大小 */
+  cursor: pointer; /* 滑鼠變成手型 */
+  border-radius: 4px; /* 設定圓角 */
+  border: none; /* 移除邊框 */
   width: 150px; /* 固定按鈕寬度 */
   height: 50px; /* 固定按鈕高度 */
-  text-align: center; /* 文字水平居中 */
+  text-align: center; /* 文字水平置中 */
   background-color: #e0e0e0; /* 一般按鈕背景色 */
 }
+
+/* 一般按鈕的懸停效果 */
 .btn:hover {
-	background-color: #afafaf;
+  background-color: #afafaf; /* 懸停時變更背景色為較深的灰色 */
 }
-.green {
-  background-color: #28a745;
-  color: white;
+
+/* 類別按鈕的樣式 */
+.category-btn {
+  display: block; /* 設定為塊級元素 */
+  padding: 10px 20px; /* 設定內邊距 */
+  font-size: 16px; /* 設定字體大小 */
+  cursor: pointer; /* 滑鼠變成手型 */
+  border-radius: 4px; /* 設定圓角 */
+  border: none; /* 移除邊框 */
+  width: 150px; /* 固定按鈕寬度 */
+  height: 50px; /* 固定按鈕高度 */
+  text-align: center; /* 文字水平置中 */
+  background-color: #e0e0e0; /* 一般按鈕背景色 */
 }
-.green:hover{
-	background-color: #218838;
+
+/* 白色按鈕的樣式 */
+.white {
+  background-color: #e0e0e0; /* 一般按鈕背景色 */
 }
+
+/* 白色按鈕的懸停效果 */
+.white:hover {
+  background-color: #afafaf; /* 懸停時變更背景色為較深的灰色 */
+}
+
+/* 紅色按鈕的樣式 */
+.red {
+  background-color: #ff4010; /* 紅色背景 */
+  color: white; /* 文字顏色為白色 */
+}
+
+/* 橙色按鈕的樣式 */
 .orange {
-  background-color: #fd7e14;
-  color: white;
-}
-.orange:hover{
-	background-color: #d3660d;
+  background-color: #fd9023; /* 橙色背景 */
+  color: white; /* 文字顏色為白色 */
 }
 
+/* 黃色按鈕的樣式 */
+.yellow {
+  background-color: #FFD700; /* 黃色背景 */
+  color: white; /* 文字顏色為白色 */
+}
+
+/* 綠色按鈕的樣式 */
+.green {
+  background-color: #5dca63; /* 綠色背景 */
+  color: white; /* 文字顏色為白色 */
+}
+
+/* 藍色按鈕的樣式 */
+.blue {
+  background-color: #2196F3; /* 藍色背景 */
+  color: white; /* 文字顏色為白色 */
+}
+
+/* 紫色按鈕的樣式 */
+.purple {
+  background-color: #8B00FF; /* 紫色背景 */
+  color: white; /* 文字顏色為白色 */
+}
+
+/* 紅色按鈕的懸停效果 */
+.red:hover {
+  background-color: #d83911; /* 懸停時變更為較深的紅色 */
+}
+
+/* 橙色按鈕的懸停效果 */
+.orange:hover {
+  background-color: #e07b00; /* 懸停時變更為較深的橙色 */
+}
+
+/* 黃色按鈕的懸停效果 */
+.yellow:hover {
+  background-color: #d3b300; /* 懸停時變更為較深的黃色 */
+}
+
+/* 綠色按鈕的懸停效果 */
+.green:hover {
+  background-color: #45a049; /* 懸停時變更為蘋果綠 */
+}
+
+/* 藍色按鈕的懸停效果 */
+.blue:hover {
+  background-color: #1976D2; /* 懸停時變更為較深的藍色 */
+}
+
+/* 紫色按鈕的懸停效果 */
+.purple:hover {
+  background-color: #9400D3; /* 懸停時變更為較深的紫色 */
+}
+
+/* 類別容器的樣式 */
+.category-container { 
+  display: flex; /* 使用彈性盒模型 */
+  flex-direction: column; /* 垂直排列子元素 */
+  gap: 20px; /* 子元素之間的間隔 */
+  margin-top: 20px; /* 上方外邊距 */
+  width: 100%; /* 容器寬度佔滿全寬 */
+  padding: 0 20px; /* 左右內邊距 */
+  box-sizing: border-box; /* 盒模型包含內邊距 */
+}
+
+/* 類別容器內按鈕的樣式 */
+.category-container .category-btn {
+  padding: 10px 20px; /* 內邊距 */
+  font-size: 1em; /* 字體大小 */
+  border-radius: 5px; /* 圓角 */
+  border: none; /* 移除邊框 */
+  cursor: pointer; /* 滑鼠變成手型 */
+  width: 100%; /* 按鈕寬度佔滿父容器 */
+  max-width: none; /* 移除最大寬度限制 */
+  text-align: center; /* 文字水平置中 */
+  box-sizing: border-box; /* 盒模型包含內邊距 */
+}
+
+/* 逐字稿容器的樣式 */
 .transcript {
-  position: relative;
-  border: 1px solid #ddd;
-  padding: 10px;
-  border-radius: 5px;
-  margin-bottom: 10px;
-  background-color: #f9f9f9;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  position: relative; /* 相對定位 */
+  border: 1px solid #ddd; /* 灰色邊框 */
+  padding: 10px; /* 內邊距 */
+  border-radius: 5px; /* 圓角 */
+  margin-bottom: 10px; /* 下方外邊距 */
+  background-color: #f9f9f9; /* 背景色 */
+  display: flex; /* 使用彈性盒模型 */
+  justify-content: space-between; /* 子元素間距分配 */
+  align-items: center; /* 交叉軸置中對齊 */
 }
 
+/* 逐字稿時間戳的樣式 */
 .transcript-timestamp {
-  font-weight: bold;
-  margin-right: 10px;
-  font-size: 0.9em;
-  color: #888;
-  background-color: #f1f1f1;
-  padding: 3px 5px;
-  border-radius: 3px;
-  display: inline-block;
-  flex: 0 0 auto;
-  min-width: 120px;
-  white-space: nowrap;
-  align-self: center;
+  font-weight: bold; /* 文字加粗 */
+  margin-right: 10px; /* 右側外邊距 */
+  font-size: 0.9em; /* 字體大小 */
+  color: #888; /* 字體顏色為灰色 */
+  background-color: #f1f1f1; /* 背景色 */
+  padding: 3px 5px; /* 內邊距 */
+  border-radius: 3px; /* 圓角 */
+  display: inline-block; /* 內聯塊元素 */
+  flex: 0 0 auto; /* 不縮放且固定大小 */
+  min-width: 120px; /* 最小寬度 */
+  white-space: nowrap; /* 禁止換行 */
+  align-self: center; /* 自身在交叉軸上置中 */
 }
 
+/* 逐字稿內容的樣式 */
 .transcript-content {
-  margin-top: 5px;
-  flex: 1 1 auto;
-  overflow-wrap: break-word;
+  margin-top: 5px; /* 上方外邊距 */
+  flex: 1 1 auto; /* 允許縮放和增長 */
+  overflow-wrap: break-word; /* 自動換行 */
 }
 
+/* 按鈕容器的樣式 */
 .button-container {
-  display: flex;
-  gap: 5px;
-  align-items: center;
-  justify-content: flex-end;
-  align-self: center;
-  flex: 0 0 auto;
-  visibility: hidden;
+  display: flex; /* 使用彈性盒模型 */
+  gap: 5px; /* 子元素間隔 */
+  align-items: center; /* 交叉軸置中對齊 */
+  justify-content: flex-end; /* 主軸右對齊 */
+  align-self: center; /* 自身在父容器中置中 */
+  flex: 0 0 auto; /* 不縮放且固定大小 */
+  visibility: hidden; /* 初始隱藏 */
 }
 
+/* 當滑鼠懸停在逐字稿上時顯示按鈕容器 */
 .transcript:hover .button-container {
-  visibility: visible;
+  visibility: visible; /* 顯示按鈕容器 */
 }
 
+/* 編輯和刪除按鈕的樣式 */
 .edit-button,
 .delete-button {
-  border: none;
-  border-radius: 3px;
-  padding: 3px 10px;
-  cursor: pointer;
-  color: white;
-  margin-right: 0;
+  border: none; /* 移除邊框 */
+  border-radius: 3px; /* 圓角 */
+  padding: 3px 10px; /* 內邊距 */
+  cursor: pointer; /* 滑鼠變成手型 */
+  color: white; /* 文字顏色為白色 */
+  margin-right: 0; /* 右側外邊距 */
 }
 
-.edit-button {
-  background-color: #4CAF50;
-}
-
-.delete-button {
-  background-color: #f44336;
-}
-
+/* 過濾輸入框的樣式 */
 .filter-input {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 15px;
+  display: flex; /* 使用彈性盒模型 */
+  align-items: center; /* 交叉軸置中對齊 */
+  gap: 10px; /* 子元素間隔 */
+  margin-top: 15px; /* 上方外邊距 */
 }
 
+/* 逐字稿輸入框的樣式 */
 .transcript-input {
-  width: 100%;
-  height: 100%;
-  resize: none;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 1em;
-  background-color: #fafafa;
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  width: 100%; /* 寬度佔滿父容器 */
+  height: 100%; /* 高度佔滿父容器 */
+  resize: none; /* 禁止調整大小 */
+  padding: 10px; /* 內邊距 */
+  border: 1px solid #ccc; /* 灰色邊框 */
+  border-radius: 5px; /* 圓角 */
+  font-size: 1em; /* 字體大小 */
+  background-color: #fafafa; /* 背景色 */
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* 陰影效果 */
 }
 
+/* 上傳按鈕的樣式 */
 .upload-button {
-  background-color: #2196F3;
-  color: white;
-  border: none;
-  border-radius: 3px;
-  padding: 8px 12px;
-  cursor: pointer;
+  color: white; /* 文字顏色為白色 */
+  border: none; /* 移除邊框 */
+  border-radius: 3px; /* 圓角 */
+  padding: 8px 12px; /* 內邊距 */
+  cursor: pointer; /* 滑鼠變成手型 */
 }
 
-.upload-button:hover {
-  background-color: #1976D2;
+/* 區塊的樣式 */
+.section {
+  margin: 20px 0; /* 上下外邊距 */
+  padding: 20px; /* 內邊距 */
+  border: 1px solid #ddd; /* 灰色邊框 */
+  border-radius: 5px; /* 圓角 */
+  background-color: #f9f9f9; /* 背景色 */
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* 陰影效果 */
+  overflow: hidden; /* 隱藏溢出內容 */
 }
 
-.edit-button:hover {
-  background-color: #45a049;
+/* 內容顯示區域的樣式 */
+.classified-text,
+.focused-text,
+.input-text {
+  width: calc(100% - 40px); /* 寬度為父容器減去40px */
+  padding: 15px; /* 內邊距 */
+  border: 1px solid #ccc; /* 灰色邊框 */
+  border-radius: 5px; /* 圓角 */
+  background-color: #ffffff; /* 白色背景 */
+  font-size: 1em; /* 字體大小 */
+  line-height: 1.5; /* 行高 */
+  margin-top: 10px; /* 上方外邊距 */
+  overflow-wrap: break-word; /* 自動換行 */
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* 陰影效果 */
 }
 
-.delete-button:hover {
-  background-color: #e53935;
+/* 輸入文字區域的額外樣式 */
+.input-text {
+  height: 150px; /* 固定高度 */
+  resize: none; /* 禁止調整大小 */
+  background-color: #fafafa; /* 背景色 */
 }
 
-.edit-button {
-  background-color: #5dca63;
-}
-
-.delete-button {
-  background-color: #fc4340;
+/* 區塊標題的樣式 */
+.section h2 {
+  font-size: 1.2em; /* 字體大小 */
+  color: #333; /* 文字顏色為深灰 */
+  margin-bottom: 10px; /* 下方外邊距 */
 }
