@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="../static/css/style.css">
 
     <style>
-        .name {
+        .nameList {
             border: 1px solid #ddd;
             padding: 15px;
             border-radius: 5px;
@@ -16,7 +16,7 @@
             display: none; /* 初始隱藏按鈕列表 */
         }
 
-        .name button {
+        .nameList button {
             margin: 5px;
             padding: 10px;
             border-radius: 5px;
@@ -26,8 +26,16 @@
             cursor: pointer;
         }
 
-        .name button:hover {
+        .nameList button:hover {
             background-color: #45a049;
+        }
+
+        .filter-input {
+            margin-bottom: 10px;
+            padding: 10px;
+            width: calc(100% - 20px);
+            border-radius: 5px;
+            border: 1px solid #ddd;
         }
     </style>
 </head>
@@ -36,12 +44,11 @@
         <div class="content-wrapper">
             <img src="../static/images/profile/01.png" sizes="(max-width: 1px) 5vw, 1px" alt="頭像" class="avatar">
             <!-- 點擊此名稱觸發按鈕列表顯示/隱藏 -->
-            <div class="toggle-header" onclick="toggleButtons()">林阿伯</div>
+            <div class="toggle-header" id="toggleHeader" onclick="toggleButtons()">林阿伯</div>
             <!-- 按鈕列表 -->
-            <div class="name" id="buttonList">
-                <button>林阿伯1</button>
-                <button>林阿伯2</button>
-                <button>林阿伯3</button>
+            <div class="nameList" id="nameList1">
+                <button id="addNewButton" class="add-name-button" style="display: block;" onclick="addNewName()">新增姓名</button>
+                <!-- 下方的按鈕將由後端清單生成 -->
             </div>
         </div>
     </header>
@@ -55,17 +62,5 @@
         </div>
     </main>
     <script src="../static/js/index.js"></script>
-    <script>
-        // JavaScript 用於切換按鈕列表的顯示/隱藏
-        function toggleButtons() {
-            const buttonList = document.getElementById('buttonList');
-            if (buttonList.style.display === 'none' || buttonList.style.display === '') {
-                buttonList.style.display = 'flex'; // 顯示按鈕列表
-                buttonList.style.flexDirection = 'column'; // 垂直排列按鈕
-            } else {
-                buttonList.style.display = 'none'; // 隱藏按鈕列表
-            }
-        }
-    </script>
 </body>
 </html>
