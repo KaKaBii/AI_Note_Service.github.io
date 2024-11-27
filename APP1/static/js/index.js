@@ -1,3 +1,9 @@
+// 當頁面加載時獲取逐字稿列表
+document.addEventListener('DOMContentLoaded', () => {
+    const pageTitle = document.getElementById('toggleHeader');
+    fetchTranscriptsByPerson(pageTitle.textContent);
+});
+
 document.getElementById("start-recording").addEventListener("click", async () => {
   //alert("錄音功能尚未實作，這裡可連接語音轉文字服務。");
   try {
@@ -92,14 +98,14 @@ function filterNameList() {
 
 // 添加 "新增" 按鈕如果未找到結果
 function addNewButtonIfNoneFound(found = false) {
-  console.log('Checking if need to add new button. Found:', found);
+  //console.log('Checking if need to add new button. Found:', found);
   const addNewButton = document.getElementById('addNewButton');
   if (addNewButton) {
       if (!found) {
-          console.log('No matching names found. Displaying add new button.');
+          //console.log('No matching names found. Displaying add new button.');
           addNewButton.style.display = 'block';
       } else {
-          console.log('Matching names found. Hiding add new button.');
+          //console.log('Matching names found. Hiding add new button.');
           addNewButton.style.display = 'none';
       }
   }
@@ -144,5 +150,73 @@ function SwitchIndivisual(name) {
       console.log(`Switching to individual: ${name}`);
       // 更改首頁的 toggle header 名稱
       toggleHeader.textContent = name;
+      fetchTranscriptsByPerson(name);
   }
 } 
+
+
+// 根據 toggleHeader 的名稱從資料庫獲取對應對象的逐字稿
+function fetchTranscriptsByPerson(personName) {
+    console.log(`Fetching transcripts for: ${personName}`);
+    fetch(`/fetchTranscripts?person=${personName}`)
+        .then(response => {
+            console.log(`Response status: ${response.status}`);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Transcripts data received:', data);
+            const container = document.getElementById('transcripts-container');
+            
+            if (container) {  // 確保元素存在
+                container.innerHTML = ''; //清空
+                // 添加輸入框和上傳按鈕的包裝區塊
+                const inputContainer = document.createElement('div');
+                inputContainer.className = 'filter-input';
+                inputContainer.style.display = 'flex';
+                inputContainer.style.alignItems = 'center';
+                inputContainer.style.gap = '10px';
+
+                // 輸入框
+                const transcriptInput = document.createElement('textarea');
+                transcriptInput.id = 'transcript-input';
+                transcriptInput.placeholder = '輸入逐字稿內容...';
+                transcriptInput.className = 'transcript-input';
+                transcriptInput.style.flex = '1';
+                transcriptInput.style.width = '400px';
+                transcriptInput.style.height = '50px';
+                transcriptInput.style.resize = 'none'; // 禁止拖拉調整大小
+                inputContainer.appendChild(transcriptInput);
+
+                // 上傳按鈕
+                const uploadButton = document.createElement('button');
+                uploadButton.textContent = '上傳逐字稿';
+                uploadButton.className = 'btn upload-button';
+                uploadButton.onclick = uploadTranscript;
+                inputContainer.appendChild(uploadButton);
+                container.appendChild(inputContainer);
+
+                data.forEach((transcript, index) => {
+                    console.log(`Rendering transcript ${index + 1}:`, transcript);
+
+                    // 添加 timestamp
+                    const timestampDiv = document.createElement('div');
+                    timestampDiv.className = 'transcript-timestamp';
+                    timestampDiv.style.fontWeight = 'bold';
+                    timestampDiv.style.marginRight = '10px';
+                    timestampDiv.textContent = transcript.timestamp;
+                    container.appendChild(timestampDiv);
+
+                    // 添加 transcript 內容
+                    const transcriptDiv = document.createElement('div');
+                    transcriptDiv.className = 'transcript';
+                    transcriptDiv.textContent = transcript.content;
+                    container.appendChild(transcriptDiv);
+                });
+
+            } else {
+                console.error("Element with ID 'text-container' not found.");
+            }
+        })
+        .catch(error => console.error('Error fetching transcripts:', error));
+}
+
