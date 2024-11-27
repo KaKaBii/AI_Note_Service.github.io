@@ -21,14 +21,15 @@ document.getElementById("start-recording").addEventListener("click", async () =>
   }
 });
 
-//document.getElementById("next-page").addEventListener("click", () => {
-//  window.location.href = "../templates/class.html";
-//});
+document.getElementById("next-page").addEventListener("click", () => {
+    console.log('Navigating to class.html');
+    window.location.href = '/classify'; // 指向 Flask 路由
+});
 
-function nextPage(){
-  console.log('Navigating to class.html');
-  window.location.href = '/classify'; // 指向 Flask 路由
-}
+document.getElementById("upload-recording").addEventListener("click", () => {
+    alert("上傳錄音功能尚未實作");
+});
+
 
 // JavaScript 用於切換按鈕列表的顯示/隱藏
 function toggleButtons() {
@@ -193,14 +194,14 @@ function fetchTranscriptsByPerson(personName) {
                     // 編輯按鈕
                     const editButton = document.createElement('button');
                     editButton.textContent = '編輯';
-                    editButton.className = 'edit-button';
+                    editButton.className = 'edit-button green';
                     editButton.onclick = () => editTranscript(transcriptObj, contentDiv);
                     buttonContainer.appendChild(editButton);
 
                     // 刪除按鈕
                     const deleteButton = document.createElement('button');
                     deleteButton.textContent = '刪除';
-                    deleteButton.className = 'delete-button';
+                    deleteButton.className = 'delete-button red';
                     deleteButton.onclick = () => deleteTranscript(transcriptObj.timestamp);
                     buttonContainer.appendChild(deleteButton);
 
@@ -230,7 +231,7 @@ function fetchTranscriptsByPerson(personName) {
                 // 上傳按鈕
                 const uploadButton = document.createElement('button');
                 uploadButton.textContent = '上傳';
-                uploadButton.className = 'btn upload-button';
+                uploadButton.className = 'btn upload-button blue';
                 uploadButton.onclick = uploadTranscript;
                 inputContainer.appendChild(uploadButton);
 
