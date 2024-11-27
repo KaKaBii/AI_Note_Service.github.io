@@ -37,6 +37,27 @@
             border-radius: 5px;
             border: 1px solid #ddd;
         }
+
+        .transcripts-container {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 5px;
+            background-color: #f3f3f3;
+            margin-top: 20px;
+        }
+
+        .transcript {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+
+        .transcript-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -44,7 +65,7 @@
         <div class="content-wrapper">
             <img src="../static/images/profile/01.png" sizes="(max-width: 1px) 5vw, 1px" alt="頭像" class="avatar">
             <!-- 點擊此名稱觸發按鈕列表顯示/隱藏 -->
-            <div class="toggle-header" id="toggleHeader" onclick="toggleButtons()">林阿伯</div>
+            <div class="toggle-header" id="toggleHeader" onclick="toggleButtons()">張偉</div>
             <!-- 按鈕列表 -->
             <div class="nameList" id="nameList1">
                 <button id="addNewButton" class="add-name-button" style="display: block;" onclick="addNewName()">新增姓名</button>
@@ -53,14 +74,57 @@
         </div>
     </header>
     <main>
-        <div class="text-container" id="text-container">
-            <!-- 逐字稿內容將顯示於此 -->
+        <div class="transcripts-container" id="transcripts-container">
+            <!-- 從資料庫中獲取的多份逐字稿 -->
         </div>
         <div class="controls">
             <button id="start-recording" class="btn green">🎤 開啟錄音</button>
-            <button id="next-page" class="btn orange">➡ 下一頁</button>
+            <button id="next-page" class="btn orange" onclick="nextPage()">➡ 下一頁</button>
         </div>
     </main>
     <script src="../static/js/index.js"></script>
+    <script>
+        function uploadTranscript(){
+            console.log('Uploading transcript...');
+            const transcriptInput = document.getElementById('transcript-input');
+            const personName = document.getElementById('toggleHeader').textContent.trim();
+
+            if (transcriptInput && personName) {
+                const transcriptContent = transcriptInput.value.trim();
+                if (transcriptContent) {
+                    fetch(`/uploadTranscript?name=${personName}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            name: personName,
+                            content: transcriptContent
+                        })
+                    })
+                    .then(response => {
+                        console.log(`Response status: ${response.status}`);
+                        if (response.ok) {
+                            console.log('Transcript successfully uploaded');
+                            alert('逐字稿上傳成功');
+                            fetchTranscriptsByPerson(personName); // 上傳後更新逐字稿顯示
+                        } else {
+                            console.error('Failed to upload transcript');
+                            alert('逐字稿上傳失敗，請重試');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error uploading transcript:', error);
+                        alert('上傳過程中發生錯誤，請重試');
+                    });
+                } else {
+                    alert('請輸入逐字稿內容後再上傳');
+                }
+            } else {
+                console.error('Transcript input or person name is missing.');
+            }
+        }
+
+    </script>
 </body>
 </html>
