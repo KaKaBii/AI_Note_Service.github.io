@@ -15,9 +15,14 @@ document.getElementById("start-recording").addEventListener("click", async () =>
   }
 });
 
-document.getElementById("next-page").addEventListener("click", () => {
-  window.location.href = "../templates/class.html";
-});
+//document.getElementById("next-page").addEventListener("click", () => {
+//  window.location.href = "../templates/class.html";
+//});
+
+function nextPage(){
+  console.log('Navigating to class.html');
+  window.location.href = '/classify'; // 指向 Flask 路由
+}
 
 // JavaScript 用於切換按鈕列表的顯示/隱藏
 function toggleButtons() {
