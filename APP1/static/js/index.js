@@ -154,8 +154,6 @@ function SwitchIndivisual(name) {
   }
 } 
 
-
-// 根據 toggleHeader 的名稱從資料庫獲取對應對象的逐字稿
 function fetchTranscriptsByPerson(personName) {
     console.log(`Fetching transcripts for: ${personName}`);
     fetch(`/fetchTranscripts?person=${personName}`)
@@ -169,50 +167,74 @@ function fetchTranscriptsByPerson(personName) {
             
             if (container) {  // 確保元素存在
                 container.innerHTML = ''; //清空
+                data.forEach((transcriptObj, index) => {
+                    console.log(`Rendering transcript ${index + 1}:`, transcriptObj);
+                    const transcriptDiv = document.createElement('div');
+                    transcriptDiv.className = 'transcript';
+
+                    // 添加 timestamp
+                    const timestampDiv = document.createElement('div');
+                    timestampDiv.className = 'transcript-timestamp';
+                    timestampDiv.textContent = transcriptObj.timestamp;
+                    transcriptDiv.appendChild(timestampDiv);
+
+                    // 添加 transcript 內容
+                    const contentDiv = document.createElement('div');
+                    contentDiv.className = 'transcript-content';
+                    contentDiv.textContent = transcriptObj.content;
+                    transcriptDiv.appendChild(contentDiv);
+
+                    // 編輯和刪除按鈕容器
+                    const buttonContainer = document.createElement('div');
+                    buttonContainer.className = 'button-container';
+                    buttonContainer.style.display = 'none';
+                    transcriptDiv.appendChild(buttonContainer);
+
+                    // 編輯按鈕
+                    const editButton = document.createElement('button');
+                    editButton.textContent = '編輯';
+                    editButton.className = 'edit-button';
+                    editButton.onclick = () => editTranscript(transcriptObj, contentDiv);
+                    buttonContainer.appendChild(editButton);
+
+                    // 刪除按鈕
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = '刪除';
+                    deleteButton.className = 'delete-button';
+                    deleteButton.onclick = () => deleteTranscript(transcriptObj.timestamp);
+                    buttonContainer.appendChild(deleteButton);
+
+                    // 滑鼠移入顯示編輯和刪除按鈕
+                    transcriptDiv.addEventListener('mouseenter', () => {
+                        buttonContainer.style.display = 'block';
+                    });
+
+                    // 滑鼠移出隱藏編輯和刪除按鈕
+                    transcriptDiv.addEventListener('mouseleave', () => {
+                        buttonContainer.style.display = 'none';
+                    });
+
+                    container.appendChild(transcriptDiv);
+                });
                 // 添加輸入框和上傳按鈕的包裝區塊
                 const inputContainer = document.createElement('div');
                 inputContainer.className = 'filter-input';
-                inputContainer.style.display = 'flex';
-                inputContainer.style.alignItems = 'center';
-                inputContainer.style.gap = '10px';
 
                 // 輸入框
                 const transcriptInput = document.createElement('textarea');
                 transcriptInput.id = 'transcript-input';
                 transcriptInput.placeholder = '輸入逐字稿內容...';
                 transcriptInput.className = 'transcript-input';
-                transcriptInput.style.flex = '1';
-                transcriptInput.style.width = '400px';
-                transcriptInput.style.height = '50px';
-                transcriptInput.style.resize = 'none'; // 禁止拖拉調整大小
                 inputContainer.appendChild(transcriptInput);
 
                 // 上傳按鈕
                 const uploadButton = document.createElement('button');
-                uploadButton.textContent = '上傳逐字稿';
+                uploadButton.textContent = '上傳';
                 uploadButton.className = 'btn upload-button';
                 uploadButton.onclick = uploadTranscript;
                 inputContainer.appendChild(uploadButton);
+
                 container.appendChild(inputContainer);
-
-                data.forEach((transcript, index) => {
-                    console.log(`Rendering transcript ${index + 1}:`, transcript);
-
-                    // 添加 timestamp
-                    const timestampDiv = document.createElement('div');
-                    timestampDiv.className = 'transcript-timestamp';
-                    timestampDiv.style.fontWeight = 'bold';
-                    timestampDiv.style.marginRight = '10px';
-                    timestampDiv.textContent = transcript.timestamp;
-                    container.appendChild(timestampDiv);
-
-                    // 添加 transcript 內容
-                    const transcriptDiv = document.createElement('div');
-                    transcriptDiv.className = 'transcript';
-                    transcriptDiv.textContent = transcript.content;
-                    container.appendChild(transcriptDiv);
-                });
-
             } else {
                 console.error("Element with ID 'text-container' not found.");
             }
@@ -220,3 +242,62 @@ function fetchTranscriptsByPerson(personName) {
         .catch(error => console.error('Error fetching transcripts:', error));
 }
 
+// 用於編輯逐字稿的函數
+function editTranscript(transcriptObj, contentDiv) {
+    const newContent = prompt('編輯逐字稿內容：', transcriptObj.content);
+    if (newContent !== null) {
+        fetch('/editTranscript', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                timestamp: transcriptObj.timestamp,
+                newContent: newContent
+            })
+        })
+        .then(response => {
+            if (response.ok) {
+                console.log('Transcript successfully edited');
+                alert('逐字稿編輯成功');
+                contentDiv.textContent = newContent;
+            } else {
+                console.error('Failed to edit transcript');
+                alert('逐字稿編輯失敗，請重試');
+            }
+        })
+        .catch(error => {
+            console.error('Error editing transcript:', error);
+            alert('編輯過程中發生錯誤，請重試');
+        });
+    }
+}
+
+// 用於刪除逐字稿的函數
+function deleteTranscript(timestamp) {
+    if (confirm('確定要刪除這條逐字稿嗎？')) {
+        fetch('/deleteTranscript', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                timestamp: timestamp
+            })
+        })
+        .then(response => {
+            if (response.ok) {
+                console.log('Transcript successfully deleted');
+                alert('逐字稿刪除成功');
+                fetchTranscriptsByPerson(document.getElementById('toggleHeader').textContent.trim()); // 刪除後重新加載逐字稿
+            } else {
+                console.error('Failed to delete transcript');
+                alert('逐字稿刪除失敗，請重試');
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting transcript:', error);
+            alert('刪除過程中發生錯誤，請重試');
+        });
+    }
+}
