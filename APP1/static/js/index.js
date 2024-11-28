@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// 錄音功能
 document.getElementById("start-recording").addEventListener("click", async () => {
   //alert("錄音功能尚未實作，這裡可連接語音轉文字服務。");
   try {
@@ -31,11 +32,13 @@ document.getElementById("start-recording").addEventListener("click", async () =>
   }
 });
 
+// 下一頁
 document.getElementById("next-page").addEventListener("click", () => {
     console.log('Navigating to class.html');
     window.location.href = '/classify'; // 指向 Flask 路由
 });
 
+// 觸發上傳錄音檔按鈕
 function triggerFileInput() {
     if (event) {
         event.preventDefault(); // 阻止默認的表單提交行為
@@ -56,7 +59,7 @@ function uploadRecord() {
         return;
     }
 
-    // 前端檢查文件類型
+    //前端檢查文件類型
     // const allowedExtensions = ['wav', 'mp3'];
     // const fileExtension = file.name.split('.').pop().toLowerCase();
 
@@ -67,14 +70,17 @@ function uploadRecord() {
 
     const formData = new FormData();
     formData.append('file', file);
-
-    fetch('/uploadRecord', {
+    
+    const personName = document.getElementById('toggleHeader').textContent.trim();
+    formData.append('user', personName)
+    fetch(`/uploadRecord?name=${personName}`, {
         method: 'POST',
         body: formData,
     })
     .then(response => {
         if (response.ok) {
             alert('檔案上傳成功');
+            fetchTranscriptsByPerson(personName); // 上傳後更新逐字稿顯示
         } else {
             return response.json().then(data => {
                 alert(`檔案上傳失敗：${data.message}`);
@@ -200,7 +206,7 @@ function addNewName() {
   }
 }
 
-// SwitchIndivisual 函數示例
+// 切換個案
 function SwitchIndivisual(name) {
   const toggleHeader = document.getElementById('toggleHeader');
   if (toggleHeader) {
@@ -211,6 +217,7 @@ function SwitchIndivisual(name) {
   }
 } 
 
+// 用於獲取逐字稿的函數
 function fetchTranscriptsByPerson(personName) {
     console.log(`Fetching transcripts for: ${personName}`);
     fetch(`/fetchTranscripts?person=${personName}`)
@@ -238,7 +245,11 @@ function fetchTranscriptsByPerson(personName) {
                     // 添加 transcript 內容
                     const contentDiv = document.createElement('div');
                     contentDiv.className = 'transcript-content';
-                    contentDiv.textContent = transcriptObj.content;
+
+                    // 使用 innerHTML 並將換行符號 \n 替換為 <br>
+                    const formattedContent = transcriptObj.content.replace(/\n/g, '<br>');
+                    contentDiv.innerHTML = formattedContent;
+
                     transcriptDiv.appendChild(contentDiv);
 
                     // 編輯和刪除按鈕容器
@@ -297,6 +308,48 @@ function fetchTranscriptsByPerson(personName) {
             }
         })
         .catch(error => console.error('Error fetching transcripts:', error));
+}
+
+// 用於新增逐字稿的函數
+function uploadTranscript(){
+    console.log('Uploading transcript...');
+    const transcriptInput = document.getElementById('transcript-input');
+    const personName = document.getElementById('toggleHeader').textContent.trim();
+
+    if (transcriptInput && personName) {
+        const transcriptContent = transcriptInput.value.trim();
+        if (transcriptContent) {
+            fetch(`/uploadTranscript?name=${personName}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: personName,
+                    content: transcriptContent
+                })
+            })
+            .then(response => {
+                console.log(`Response status: ${response.status}`);
+                if (response.ok) {
+                    console.log('Transcript successfully uploaded');
+                    alert('逐字稿上傳成功');
+                    fetchTranscriptsByPerson(personName); // 上傳後更新逐字稿顯示
+                } else {
+                    console.error('Failed to upload transcript');
+                    alert('逐字稿上傳失敗，請重試');
+                }
+            })
+            .catch(error => {
+                console.error('Error uploading transcript:', error);
+                alert('上傳過程中發生錯誤，請重試');
+            });
+        } else {
+            alert('請輸入逐字稿內容後再上傳');
+        }
+    } else {
+        console.error('Transcript input or person name is missing.');
+    }
 }
 
 // 用於編輯逐字稿的函數

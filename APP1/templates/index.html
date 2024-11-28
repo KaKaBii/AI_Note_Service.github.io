@@ -78,7 +78,7 @@
             <!-- 從資料庫中獲取的多份逐字稿 -->
         </div>
         <div class="controls">
-            <button id="start-recording" class="btn green">🎤 開啟錄音</button>
+            <button id="start-recording" class="btn green" style="display: none;">🎤 開啟錄音</button>
             <form id="upload-form" enctype="multipart/form-data">
                 <input type="file" id="file-input" class="upload-input" style="display: none;">
                 <button type="button" id="upload-recording" class="btn blue" onclick="triggerFileInput()">⬆️ 上傳錄音</button>
@@ -87,48 +87,6 @@
         </div>
     </main>
     <script src="../static/js/index.js"></script>
-    <script>
-        function uploadTranscript(){
-            console.log('Uploading transcript...');
-            const transcriptInput = document.getElementById('transcript-input');
-            const personName = document.getElementById('toggleHeader').textContent.trim();
 
-            if (transcriptInput && personName) {
-                const transcriptContent = transcriptInput.value.trim();
-                if (transcriptContent) {
-                    fetch(`/uploadTranscript?name=${personName}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            name: personName,
-                            content: transcriptContent
-                        })
-                    })
-                    .then(response => {
-                        console.log(`Response status: ${response.status}`);
-                        if (response.ok) {
-                            console.log('Transcript successfully uploaded');
-                            alert('逐字稿上傳成功');
-                            fetchTranscriptsByPerson(personName); // 上傳後更新逐字稿顯示
-                        } else {
-                            console.error('Failed to upload transcript');
-                            alert('逐字稿上傳失敗，請重試');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error uploading transcript:', error);
-                        alert('上傳過程中發生錯誤，請重試');
-                    });
-                } else {
-                    alert('請輸入逐字稿內容後再上傳');
-                }
-            } else {
-                console.error('Transcript input or person name is missing.');
-            }
-        }
-
-    </script>
 </body>
 </html>
