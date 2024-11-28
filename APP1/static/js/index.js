@@ -2,6 +2,16 @@
 document.addEventListener('DOMContentLoaded', () => {
     const pageTitle = document.getElementById('toggleHeader');
     fetchTranscriptsByPerson(pageTitle.textContent);
+
+    const fileInput = document.getElementById('file-input');
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files.length > 0) {
+            uploadRecord();  // 確保有選擇文件後再上傳
+        }
+        else{
+            console.log('沒有選擇檔案');
+        }
+    });
 });
 
 document.getElementById("start-recording").addEventListener("click", async () => {
@@ -26,10 +36,56 @@ document.getElementById("next-page").addEventListener("click", () => {
     window.location.href = '/classify'; // 指向 Flask 路由
 });
 
-document.getElementById("upload-recording").addEventListener("click", () => {
-    alert("上傳錄音功能尚未實作");
-});
+function triggerFileInput() {
+    if (event) {
+        event.preventDefault(); // 阻止默認的表單提交行為
+    }
+    const fileInput = document.getElementById('file-input');
+    fileInput.click();
+    //console.log('文件選擇窗口已打開');
+}
 
+//上傳錄音檔
+function uploadRecord() {
+    //console.log('執行 uploadRecord');
+    const fileInput = document.getElementById('file-input');
+    const file = fileInput.files[0];
+
+    if (!file) {
+        alert('請選擇要上傳的檔案');
+        return;
+    }
+
+    // 前端檢查文件類型
+    // const allowedExtensions = ['wav', 'mp3'];
+    // const fileExtension = file.name.split('.').pop().toLowerCase();
+
+    // if (!allowedExtensions.includes(fileExtension)) {
+    //     alert('不支持的文件類型，請選擇 WAV 或 MP3 格式的文件');
+    //     return;
+    // }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    fetch('/uploadRecord', {
+        method: 'POST',
+        body: formData,
+    })
+    .then(response => {
+        if (response.ok) {
+            alert('檔案上傳成功');
+        } else {
+            return response.json().then(data => {
+                alert(`檔案上傳失敗：${data.message}`);
+            });
+        }
+    })
+    .catch(error => {
+        console.error('上傳過程中發生錯誤:', error);
+        alert('上傳過程中發生錯誤，請再試一次');
+    });
+}
 
 // JavaScript 用於切換按鈕列表的顯示/隱藏
 function toggleButtons() {

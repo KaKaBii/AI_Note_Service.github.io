@@ -79,7 +79,10 @@
         </div>
         <div class="controls">
             <button id="start-recording" class="btn green">🎤 開啟錄音</button>
-            <button id="upload-recording" class="btn blue">⬆️ 上傳錄音</button>
+            <form id="upload-form" enctype="multipart/form-data">
+                <input type="file" id="file-input" class="upload-input" style="display: none;">
+                <button type="button" id="upload-recording" class="btn blue" onclick="triggerFileInput()">⬆️ 上傳錄音</button>
+            </form>
             <button id="next-page" class="btn orange">➡ 下一頁</button>
         </div>
     </main>
