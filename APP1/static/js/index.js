@@ -107,56 +107,71 @@ function toggleButtons() {
 
 // 清單從後端源取按鈕
 function fetchNameList() {
-  console.log('Fetching name list...');
-  fetch('/fetchNameList')
-      .then(response => response.json())
-      .then(data => {
-          console.log('Name list fetched:', data);
-          const buttonList = document.getElementById('nameList1');
-          if (buttonList) {
-              buttonList.innerHTML = '<input type="text" id="filterInput" class="filter-input" placeholder="輸入姓名進行篩選" oninput="filterNameList()">'; // 保留輸入框並清空之前的按鈕
-              let addNewButton = document.getElementById('addNewButton');
-              if (!addNewButton) {
-                  addNewButton = document.createElement('button');
-                  addNewButton.id = 'addNewButton';
-                  addNewButton.textContent = '新增姓名';
-                  addNewButton.className = 'add-name-button';
-                  addNewButton.onclick = () => addNewName();
-                  buttonList.appendChild(addNewButton);
-              }
-              let found = false;
-              data.forEach(name => {
-                  if (name.toLowerCase().includes(document.getElementById('filterInput').value.trim().toLowerCase())) {
-                      found = true;
-                      const button = document.createElement('button');
-                      button.textContent = name;
-                      button.onclick = () => SwitchIndivisual(name); // 添加 SwitchIndivisual 函數
-                      buttonList.appendChild(button);
-                  }
-              });
-              console.log('Found matching names:', found);
-              addNewButtonIfNoneFound(found); // 在更新按鈕列表後檢查是否需要顯示新增按鈕
-          }
-      })
-      .catch(error => console.error('Error fetching name list:', error));
+    console.log('Fetching name list...');
+    fetch('/fetchNameList')
+        .then(response => response.json())
+            .then(data => {
+                console.log('Name list fetched:', data);
+                const buttonList = document.getElementById('nameList1');
+                if (buttonList) {
+                    buttonList.innerHTML = '<input type="text" id="filterInput" class="filter-input" placeholder="輸入姓名進行篩選" oninput="filterNameList()">'; // 保留輸入框並清空之前的按鈕
+                    let addNewButton = document.getElementById('addNewButton');
+                if (!addNewButton) {
+                    addNewButton = document.createElement('button');
+                    addNewButton.id = 'addNewButton';
+                    addNewButton.textContent = '新增姓名';
+                    addNewButton.className = 'add-name-button';
+                    addNewButton.style.display = 'none';
+                    addNewButton.onclick = () => addNewName();
+                    buttonList.appendChild(addNewButton);
+                }
+                else{
+                    addNewButton.style.display = 'none';
+                }
+                let found = false;
+                data.forEach(name => {
+                if (name.toLowerCase().includes(document.getElementById('filterInput').value.trim().toLowerCase())) {
+                    found = true;
+                    const button = document.createElement('button');
+                    button.textContent = name;
+                    button.onclick = () => SwitchIndivisual(name); // 添加 SwitchIndivisual 函數
+                    buttonList.appendChild(button);
+                }
+                });
+                console.log('Found matching names:', found);
+                addNewButtonIfNoneFound(found); // 在更新按鈕列表後檢查是否需要顯示新增按鈕
+                }
+            })
+        .catch(error => console.error('Error fetching name list:', error));
 }
 
 // 根據輸入框的值進行篩選
 function filterNameList() {
-  const filterValue = document.getElementById('filterInput').value.trim().toLowerCase();
-  console.log('Filtering name list with value:', filterValue);
-  const buttons = document.querySelectorAll('#nameList1 button');
-  let found = false;
-  buttons.forEach(button => {
-      if (button.textContent.toLowerCase().includes(filterValue)) {
-          button.style.display = 'block';
-          found = true;
-      } else {
-          button.style.display = 'none';
-      }
-  });
-  console.log('Found any matching buttons:', found);
-  addNewButtonIfNoneFound(found);
+    const filterValue = document.getElementById('filterInput').value.trim().toLowerCase();
+    console.log('Filtering name list with value:', filterValue);
+    const buttons = document.querySelectorAll('#nameList1 button');
+    let found = false;
+    
+    buttons.forEach(button => {
+        if (button.textContent.toLowerCase().includes(filterValue)) {
+            button.style.display = 'block';
+        if(button.textContent.trim().toLowerCase() == filterValue){
+            found = true; // 找到完全匹配的值
+        }
+        } else {
+            button.style.display = 'none';
+        }
+
+    });
+    
+    // 如果輸入框沒有內容，僅隱藏「新增」按鈕，並退出函式
+    if (filterValue === '') {
+        console.log('Input is empty. Hiding add new button.');
+        addNewButtonIfNoneFound(true); // 隱藏新增按鈕
+        return;
+    }
+    console.log('Found any matching buttons:', found);
+    addNewButtonIfNoneFound(found);
 }
 
 // 添加 "新增" 按鈕如果未找到結果
@@ -165,7 +180,7 @@ function addNewButtonIfNoneFound(found = false) {
   const addNewButton = document.getElementById('addNewButton');
   if (addNewButton) {
       if (!found) {
-          //console.log('No matching names found. Displaying add new button.');
+          console.log('No matching names found. Displaying add new button.');
           addNewButton.style.display = 'block';
       } else {
           //console.log('Matching names found. Hiding add new button.');
