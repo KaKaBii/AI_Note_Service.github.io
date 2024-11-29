@@ -230,7 +230,8 @@ header {
 
 /* 編輯和刪除按鈕的樣式 */
 .edit-button,
-.delete-button {
+.delete-button,
+.confirm-button{
   border: none; /* 移除邊框 */
   border-radius: 3px; /* 圓角 */
   padding: 3px 10px; /* 內邊距 */

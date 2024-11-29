@@ -266,6 +266,76 @@ function fetchTranscriptsByPerson(personName) {
                     contentDiv.innerHTML = formattedContent;
 
                     transcriptDiv.appendChild(contentDiv);
+                    
+                    // 添加點擊事件以便直接編輯
+                    contentDiv.onclick = () => {
+                        // 設置為可編輯並獲取焦點
+                        contentDiv.contentEditable = "true";
+                        contentDiv.focus();
+
+                        // 修改按鈕為"確認"
+                        editButton.textContent = '確認';
+                        editButton.className = 'confirm-button blue';
+
+                        // 在內容上失去焦點時，保存變更
+                        contentDiv.onblur = () => {
+                            // 如果當前按鈕還是“確認”，則需要執行確認邏輯
+                            if (editButton.textContent === '確認') {
+                                const newContent = contentDiv.innerHTML.replace(/<br>/g, '\n');
+                                
+                                // 檢查內容是否已修改
+                                if (newContent === transcriptObj.content) {
+                                    // 如果內容沒有改變
+                                    //alert('內容沒有變更');
+                                    // 取消可編輯狀態
+                                    contentDiv.contentEditable = "false";
+
+                                    // 將按鈕改回"編輯"
+                                    editButton.textContent = '編輯';
+                                    editButton.className = 'edit-button green';
+
+                                    // 恢復按鈕的默認樣式
+                                    editButton.style.border = '';
+                                    editButton.style.outline = '';
+                                    return; // 不繼續發送請求
+                                }
+
+                                // 發送 fetch 請求
+                                fetch('/editTranscript', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        timestamp: transcriptObj.timestamp,
+                                        newContent: newContent
+                                    })
+                                })
+                                .then(response => {
+                                    if (response.ok) {
+                                        console.log('Transcript successfully edited');
+                                        alert('逐字稿編輯成功');
+                                        // 取消可編輯狀態
+                                        contentDiv.contentEditable = "false";
+
+                                        // 更新顯示的內容
+                                        contentDiv.innerHTML = newContent.replace(/\n/g, '<br>');
+
+                                        // 將按鈕改回"編輯"
+                                        editButton.textContent = '編輯';
+                                        editButton.className = 'edit-button green';
+                                    } else {
+                                        console.error('Failed to edit transcript');
+                                        alert('逐字稿編輯失敗，請重試');
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error editing transcript:', error);
+                                    alert('編輯過程中發生錯誤，請重試');
+                                });
+                            }
+                        };
+                    };
 
                     // 編輯和刪除按鈕容器
                     const buttonContainer = document.createElement('div');
@@ -277,7 +347,71 @@ function fetchTranscriptsByPerson(personName) {
                     const editButton = document.createElement('button');
                     editButton.textContent = '編輯';
                     editButton.className = 'edit-button green';
-                    editButton.onclick = () => editTranscript(transcriptObj, contentDiv);
+                    editButton.onclick = () => {
+                        if (editButton.textContent === '編輯') {
+                            // 設置為可編輯並獲取焦點
+                            contentDiv.contentEditable = "true";
+                            contentDiv.focus();
+
+                            // 修改按鈕為"確認"
+                            editButton.textContent = '確認';
+                            editButton.className = 'confirm-button blue';
+                        } else {
+                            // 如果按鈕顯示"確認"，則保存更改並發送請求
+                            const newContent = contentDiv.innerHTML.replace(/<br>/g, '\n');
+                            
+                            // 檢查內容是否已修改
+                            if (newContent === transcriptObj.content) {
+                                // 如果內容沒有改變
+                                alert('內容沒有變更');
+                                // 取消可編輯狀態
+                                contentDiv.contentEditable = "false";
+
+                                // 將按鈕改回"編輯"
+                                editButton.textContent = '編輯';
+                                editButton.className = 'edit-button green';
+
+                                // 恢復按鈕的默認樣式
+                                editButton.style.border = '';
+                                editButton.style.outline = '';
+                                return; // 不繼續發送請求
+                            }
+                            
+                            // 發送 fetch 請求
+                            fetch('/editTranscript', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    timestamp: transcriptObj.timestamp,
+                                    newContent: newContent
+                                })
+                            })
+                            .then(response => {
+                                if (response.ok) {
+                                    console.log('Transcript successfully edited');
+                                    alert('逐字稿編輯成功');
+                                    // 取消可編輯狀態
+                                    contentDiv.contentEditable = "false";
+
+                                    // 更新顯示的內容
+                                    contentDiv.innerHTML = newContent.replace(/\n/g, '<br>');
+
+                                    // 將按鈕改回"編輯"
+                                    editButton.textContent = '編輯';
+                                    editButton.className = 'edit-button green';
+                                } else {
+                                    console.error('Failed to edit transcript');
+                                    alert('逐字稿編輯失敗，請重試');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error editing transcript:', error);
+                                alert('編輯過程中發生錯誤，請重試');
+                            });
+                        }
+                    };
                     buttonContainer.appendChild(editButton);
 
                     // 刪除按鈕
