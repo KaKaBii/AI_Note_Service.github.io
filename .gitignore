@@ -22,3 +22,10 @@ APP1/templates/.ipynb_checkpoints/classTemplate-checkpoint.html
 APP1/templates/.ipynb_checkpoints/extra_content-checkpoint.html
 APP1/templates/.ipynb_checkpoints/index-checkpoint.html
 APP1/__pycache__/gpt_classification.cpython-312.pyc
+APP1/__pycache__/gpt_classification.cpython-311.pyc
+.idea/.gitignore
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/人工智慧與設計思考.iml
+.idea/inspectionProfiles/profiles_settings.xml
