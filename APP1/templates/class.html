@@ -20,6 +20,12 @@
             <button onclick="navigateTo('/')" class="category-btn white">主畫面</button>
         </div>
     </main>
-    <script src="../static/js/class.js"></script>
+    <!--script src="../static/js/class.js"></script-->
+    <script> 
+        function navigateTo(category) {
+            // 當點擊分類按鈕時，會導向對應的分類頁面
+            window.location.href = `/category/${category}`;
+        }
+    </script>
 </body>
 </html>

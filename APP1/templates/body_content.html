@@ -3,18 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BODY</title>
+    <title>{{ title }}</title> <!-- 直接設置標題 -->
     <link rel="stylesheet" href="../static/css/style.css">
 </head>
 <body>
     <header>
-        <h1 id="page-title">BODY</h1>
+        <h1 id="page-title">{{ category_type | capitalize }}</h1>
     </header>
     <main>
         <div class="section">
             <div class="content-display">
                 <h2>分類後文本：</h2>
-                <div id="classified-text">此處顯示分類內容。</div>
+                <div id="classified-text">
+                    {% if content_data %}
+                        {% for item in content_data %}
+                            <p>{{ item[0] }} + ({{ item[1] }})</p>  <!-- 顯示每條分類內容 -->
+                        {% endfor %}
+                    {% else %}
+                        <p>該分類目前沒有內容。</p>
+                    {% endif %}
+                </div>
             </div>
         </div>
         <div class="section">

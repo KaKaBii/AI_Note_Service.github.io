@@ -1,3 +1,18 @@
+
+
+// 切換按鈕列表顯示隱藏
+function toggleButtons() {
+    const buttonList = document.getElementById('nameList1');
+    if (buttonList.style.display === 'none' || buttonList.style.display === '') {
+        buttonList.style.display = 'flex'; // 顯示按鈕列表和輸入框
+        buttonList.style.flexDirection = 'column'; // 垂直排列按鈕
+        fetchNameList(); // 只有顯示按鈕時才清單更新
+    } else {
+        buttonList.style.display = 'none'; // 隱藏按鈕列表和輸入框
+    }
+  }
+  
+
 // 當頁面加載時獲取逐字稿列表
 document.addEventListener('DOMContentLoaded', () => {
     const pageTitle = document.getElementById('toggleHeader');
@@ -93,17 +108,6 @@ function uploadRecord() {
     });
 }
 
-// JavaScript 用於切換按鈕列表的顯示/隱藏
-function toggleButtons() {
-  const buttonList = document.getElementById('nameList1');
-  if (buttonList.style.display === 'none' || buttonList.style.display === '') {
-      buttonList.style.display = 'flex'; // 顯示按鈕列表和輸入框
-      buttonList.style.flexDirection = 'column'; // 垂直排列按鈕
-      fetchNameList(); // 只有顯示按鈕時才清單更新
-  } else {
-      buttonList.style.display = 'none'; // 隱藏按鈕列表和輸入框
-  }
-}
 
 // 清單從後端源取按鈕
 function fetchNameList() {
@@ -173,6 +177,22 @@ function filterNameList() {
     console.log('Found any matching buttons:', found);
     addNewButtonIfNoneFound(found);
 }
+//前端請求 person 參數加入請求中，在分類時要用。
+fetch(`/fetchTranscripts?person=${person}`)
+    .then(response => response.json())
+    .then(data => {
+        // 檢查返回的資料是否為陣列，然後處理
+        if (Array.isArray(data)) {
+            data.forEach(item => {
+                console.log(item.content); // 處理逐字稿內容
+            });
+        } else {
+            console.error('Expected an array but got:', data);
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching transcripts:', error);
+    });
 
 // 添加 "新增" 按鈕如果未找到結果
 function addNewButtonIfNoneFound(found = false) {

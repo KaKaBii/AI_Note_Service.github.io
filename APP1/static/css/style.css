@@ -310,3 +310,93 @@ header {
   color: #333; /* 文字顏色為深灰 */
   margin-bottom: 10px; /* 下方外邊距 */
 }
+
+/* Header 全局設定 */
+.navbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background-color: #f9f9f9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+/* 左側頭像與名稱 */
+.left-section {
+  display: flex;
+  align-items: center;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.toggle-header {
+  cursor: pointer;
+  font-size: 16px;
+  color: #333;
+}
+
+/* 右側的伸縮按鈕 */
+.right-section {
+  display: flex;
+  align-items: center;
+}
+
+/* 右側的伸縮按鈕 */
+.menu-toggle {
+  font-size: 24px; /* 調整按鈕大小 */
+  cursor: pointer; /* 指針顯示為手型 */
+  user-select: none; /* 禁止文字選取 */
+  color: #000; /* 設定文字顏色為黑色 */
+  background: none; /* 確保背景透明 */
+  border: none; /* 確保沒有邊框 */
+}
+
+
+/* 下拉選單樣式 */
+.name-list {
+  position: absolute;
+  top: 60px; /* 與 navbar 高度一致 */
+  left: 10px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1100; /* 高於其他內容 */
+}
+
+.add-name-button {
+  display: block;
+  background-color: #ffa500;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  text-align: center;
+}
+
+.add-name-button:hover {
+  background-color: #e59400;
+}
+
+/* 背景遮罩 */
+.name-list-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1050;
+}

@@ -61,18 +61,21 @@
     </style>
 </head>
 <body>
-    <header>
-        <div class="content-wrapper">
-            <img src="../static/images/profile/01.png" sizes="(max-width: 1px) 5vw, 1px" alt="頭像" class="avatar">
-            <!-- 點擊此名稱觸發按鈕列表顯示/隱藏 -->
+    <header class="navbar">
+        <div class="left-section">
+            <img src="../static/images/profile/01.png" alt="頭像" class="avatar">
             <div class="toggle-header orange" id="toggleHeader" onclick="toggleButtons()">張偉</div>
-            <!-- 按鈕列表 -->
-            <div class="nameList" id="nameList1">
-                <button id="addNewButton" class="add-name-button" style="display: block;" onclick="addNewName()">新增姓名</button>
-                <!-- 下方的按鈕將由後端清單生成 -->
-            </div>
+        </div>
+        <div class="right-section">
+            <div class="menu-toggle" id="menuToggle" onclick="toggleMenu()">&#9776;</div>
         </div>
     </header>
+    <!-- 下拉選單 -->
+    <div class="name-list" id="nameList1" style="display: none;">
+        <button id="addNewButton" class="add-name-button" onclick="toggleButtons()">新增姓名</button>
+    </div>
+    
+    
     <main>
         <div class="transcripts-container" id="transcripts-container">
             <!-- 從資料庫中獲取的多份逐字稿 -->
