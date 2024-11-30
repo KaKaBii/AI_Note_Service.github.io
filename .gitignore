@@ -29,3 +29,6 @@ APP1/__pycache__/gpt_classification.cpython-311.pyc
 .idea/vcs.xml
 .idea/人工智慧與設計思考.iml
 .idea/inspectionProfiles/profiles_settings.xml
+APP1/.ipynb_checkpoints/Flask_-checkpoint.ipynb
+APP1/.ipynb_checkpoints/gpt_classification-checkpoint.py
+APP1/.ipynb_checkpoints/test-checkpoint.ipynb
