@@ -4,7 +4,8 @@ import json
 import re
 import os
 
-def GPT_classification(DATABASE_PATH="database.db", sql_command="SELECT name, content FROM transcripts ORDER BY timestamp DESC LIMIT 1"):
+def GPT_classification(DATABASE_PATH: str = "database.db",
+                             sql_command: str = "SELECT name, content FROM transcripts ORDER BY timestamp DESC LIMIT 1"):
     api_version = "2024-02-15-preview"
 
     # gets the API Key from environment variable AZURE_OPENAI_API_KEY
