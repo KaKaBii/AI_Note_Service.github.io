@@ -17,7 +17,7 @@
             <button onclick="navigateTo('social')" class="category-btn yellow">社會</button>
             <button onclick="navigateTo('special')" class="category-btn green">特殊</button>
             <button onclick="navigateTo('extra')" class="category-btn blue">其他</button>
-            <button onclick="navigateTo('/')" class="category-btn white">主畫面</button>
+            <button onclick="navigateToRoot()" class="category-btn white">主畫面</button>
         </div>
     </main>
     <!--script src="../static/js/class.js"></script-->
@@ -25,6 +25,10 @@
         function navigateTo(category) {
             // 當點擊分類按鈕時，會導向對應的分類頁面
             window.location.href = `/category/${category}`;
+        }
+        function navigateToRoot() {
+            // 當點擊分類按鈕時，會導向對應的分類頁面
+            window.location.href = `/`;
         }
     </script>
 </body>
