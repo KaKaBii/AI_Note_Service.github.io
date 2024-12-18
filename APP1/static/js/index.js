@@ -1,12 +1,10 @@
-
-
 // 切換按鈕列表顯示隱藏
 function toggleButtons() {
     const buttonList = document.getElementById('nameList1');
     if (buttonList.style.display === 'none' || buttonList.style.display === '') {
         buttonList.style.display = 'flex'; // 顯示按鈕列表和輸入框
         buttonList.style.flexDirection = 'column'; // 垂直排列按鈕
-        fetchNameList(); // 只有顯示按鈕時才清單更新
+        fetchNameList(); // 只有顯示按鈕時才更新清單
     } else {
         buttonList.style.display = 'none'; // 隱藏按鈕列表和輸入框
     }
@@ -15,6 +13,18 @@ function toggleButtons() {
 
 // 當頁面加載時獲取逐字稿列表
 document.addEventListener('DOMContentLoaded', () => {
+
+    // const userName = localStorage.getItem('userName'); // 獲取用戶名稱
+    // if (userName) {
+    //     document.getElementById('toggleHeader').textContent = userName; // 更新界面顯示
+    // }
+    // else{
+    //     // 保存用戶名稱到 sessionStorage
+    //     const userName = document.getElementById('toggleHeader').textContent.trim();
+    //     localStorage.setItem('userName', userName); 
+    // }
+    
+
     const pageTitle = document.getElementById('toggleHeader');
     fetchTranscriptsByPerson(pageTitle.textContent);
 
@@ -49,6 +59,10 @@ document.getElementById("start-recording").addEventListener("click", async () =>
 
 // 下一頁
 document.getElementById("next-page").addEventListener("click", () => {
+    // 保存用戶名稱到 sessionStorage
+    const userName = document.getElementById('toggleHeader').textContent.trim();
+    localStorage.setItem('userName', userName); 
+
     console.log('Navigating to class.html');
     window.location.href = '/classify'; // 指向 Flask 路由
 });
@@ -107,7 +121,6 @@ function uploadRecord() {
         alert('上傳過程中發生錯誤，請再試一次');
     });
 }
-
 
 // 清單從後端源取按鈕
 function fetchNameList() {
@@ -177,22 +190,23 @@ function filterNameList() {
     console.log('Found any matching buttons:', found);
     addNewButtonIfNoneFound(found);
 }
+
 //前端請求 person 參數加入請求中，在分類時要用。
-fetch(`/fetchTranscripts?person=${person}`)
-    .then(response => response.json())
-    .then(data => {
-        // 檢查返回的資料是否為陣列，然後處理
-        if (Array.isArray(data)) {
-            data.forEach(item => {
-                console.log(item.content); // 處理逐字稿內容
-            });
-        } else {
-            console.error('Expected an array but got:', data);
-        }
-    })
-    .catch(error => {
-        console.error('Error fetching transcripts:', error);
-    });
+// fetch(`/fetchTranscripts?person=${person}`)
+//     .then(response => response.json())
+//     .then(data => {
+//         // 檢查返回的資料是否為陣列，然後處理
+//         if (Array.isArray(data)) {
+//             data.forEach(item => {
+//                 console.log(item.content); // 處理逐字稿內容
+//             });
+//         } else {
+//             console.error('Expected an array but got:', data);
+//         }
+//     })
+//     .catch(error => {
+//         console.error('Error fetching transcripts:', error);
+//     });
 
 // 添加 "新增" 按鈕如果未找到結果
 function addNewButtonIfNoneFound(found = false) {
@@ -243,13 +257,19 @@ function addNewName() {
 
 // 切換個案
 function SwitchIndivisual(name) {
-  const toggleHeader = document.getElementById('toggleHeader');
-  if (toggleHeader) {
-      console.log(`Switching to individual: ${name}`);
-      // 更改首頁的 toggle header 名稱
-      toggleHeader.textContent = name;
-      fetchTranscriptsByPerson(name);
-  }
+    const toggleHeader = document.getElementById('toggleHeader');
+    if (toggleHeader) {
+        console.log(`Switching to individual: ${name}`);
+        // 更改首頁的 toggle header 名稱
+        toggleHeader.textContent = name;
+
+        // 保存用戶名稱到 sessionStorage
+        const userName = document.getElementById('toggleHeader').textContent.trim();
+        localStorage.setItem('userName', userName); 
+
+        // 獲取該個案的逐字稿
+        fetchTranscriptsByPerson(name);
+    }
 } 
 
 // 用於獲取逐字稿的函數

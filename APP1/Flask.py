@@ -11,7 +11,7 @@ import ailabs_asr.transcriber as t
 from datetime import datetime
 # from ailabs_asr.streaming import StreamingClient 
 from flask import Flask, render_template, request, jsonify
-from gpt_classification import GPT_classification
+from extension.gpt_classification import GPT_classification
 from ailabs_asr.types import ModelConfig, TranscriptionConfig
 from concurrent.futures import as_completed
 
@@ -48,27 +48,27 @@ def classify():
     return render_template('class.html')
 
 #定義身體頁面
-@app.route('/body')
+@app.route('/category/body')
 def bodyPage():
    return render_template('classTemplate.html', title = "BODY")
 
 #定義心靈頁面
-@app.route('/psycho')
+@app.route('/category/psycho')
 def psychoPage():
    return render_template('classTemplate.html', title = "PSYCHO")
 
 #定義社會頁面
-@app.route('/social')
+@app.route('/category/social')
 def socialPage():
    return render_template('classTemplate.html', title = "SOCIAL")
 
 #定義特殊頁面
-@app.route('/special')
+@app.route('/category/special')
 def specialPage():
    return render_template('classTemplate.html', title = "SPECIAL")
 
 #定義其他頁面
-@app.route('/extra')
+@app.route('/category/extra')
 def extraPage():
    return render_template('classTemplate.html', title = "EXTRA")
 
@@ -386,7 +386,6 @@ def classify_Togo(category_type):
         app.logger.error(f"Error occurred while fetching content for category {category_type}: {e}")
         return "Internal Server Error", 500
 
-# 
 # 將逐字稿保存到資料庫
 def save_transcript_to_db(user, content):
     """

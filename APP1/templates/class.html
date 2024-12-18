@@ -3,33 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CLASS</title>
+    <title>逐字稿分類</title>
     <link rel="stylesheet" href="../static/css/style.css">
+    <script>
+        // 優先更新 DOM 的內容
+        const userName = localStorage.getItem('userName');
+        if (userName) {
+            document.addEventListener('DOMContentLoaded', () => {
+                document.getElementById('toggleHeader').textContent = userName; // 更新名稱
+            });
+        }
+    </script>
 </head>
 <body>
-    <!--header>
-        <h1>分類</h1>
-    </header-->
+    <header class="navbar">
+        <div class="left-section">
+            <img src="../static/images/profile/01.png" alt="頭像" class="avatar">
+            <div class="toggle-header orange" id="toggleHeader" onclick="toggleButtons()"></div>
+        </div>
+        <div class="right-section">
+            <div class="menu-toggle" id="menuToggle" onclick="toggleMenu()">&#9776;</div>
+        </div>
+    </header>
+    <!-- 下拉選單 -->
+    <div class="name-list" id="nameList1" style="display: none;">
+        <!-- 從資料庫中獲取的個案名 -->
+    </div>
     <main>
         <div class="category-container">
-            <button onclick="navigateTo('body')" class="category-btn red">身</button>
-            <button onclick="navigateTo('psycho')" class="category-btn orange">心</button>
-            <button onclick="navigateTo('social')" class="category-btn yellow">社會</button>
-            <button onclick="navigateTo('special')" class="category-btn green">特殊</button>
-            <button onclick="navigateTo('extra')" class="category-btn blue">其他</button>
+            <div class="category-btn red" onclick="toggleList('transcripts-container-1')">
+                身
+            </div>
+            <div class="classtranscripts-container" id="transcripts-container-1" style="display: none;">
+                <!-- 從資料庫中獲取的多份逐字稿 -->
+                <p class="transcript">逐字稿 1</p>
+                <p class="transcript">逐字稿 2</p>
+            </div>
+
+            <div class="category-btn orange" onclick="toggleList('transcripts-container-2')">
+                心
+            </div>
+            <div class="classtranscripts-container" id="transcripts-container-2" style="display: none;">
+                <!-- 從資料庫中獲取的多份逐字稿 -->
+                <p class="transcript">逐字稿 3</p>
+                <p class="transcript">逐字稿 4</p>
+            </div>
+
+            <div class="category-btn yellow" onclick="toggleList('transcripts-container-3')">
+                社會
+            </div>
+            <div class="classtranscripts-container" id="transcripts-container-3" style="display: none;">
+                <!-- 從資料庫中獲取的多份逐字稿 -->
+                <p class="transcript">逐字稿 5</p>
+                <p class="transcript">逐字稿 6</p>
+            </div>
+
+            <div class="category-btn green" onclick="toggleList('transcripts-container-4')">
+                特殊
+            </div>
+            <div class="classtranscripts-container" id="transcripts-container-4" style="display: none;">
+                <!-- 從資料庫中獲取的多份逐字稿 -->
+                <p class="transcript">逐字稿 7</p>
+                <p class="transcript">逐字稿 8</p>
+            </div>
+
+            <div class="category-btn blue" onclick="toggleList('transcripts-container-5')">
+                其他
+            </div>
+            <div class="classtranscripts-container" id="transcripts-container-5" style="display: none;">
+                <!-- 從資料庫中獲取的多份逐字稿 -->
+                <p class="transcript">逐字稿 9</p>
+                <p class="transcript">逐字稿 10</p>
+            </div>
+
+            <!-- <button  class="category-btn orange">心</button>
+            <button  class="category-btn yellow">社會</button>
+            <button  class="category-btn green">特殊</button>
+            <button  class="category-btn blue">其他</button> -->
             <button onclick="navigateToRoot()" class="category-btn white">主畫面</button>
         </div>
     </main>
-    <!--script src="../static/js/class.js"></script-->
+    <script src="../static/js/class.js"></script>
     <script> 
-        function navigateTo(category) {
-            // 當點擊分類按鈕時，會導向對應的分類頁面
-            window.location.href = `/category/${category}`;
-        }
-        function navigateToRoot() {
-            // 當點擊分類按鈕時，會導向對應的分類頁面
-            window.location.href = `/`;
-        }
+
+
     </script>
 </body>
 </html>

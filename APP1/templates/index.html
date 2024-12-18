@@ -38,27 +38,21 @@
             border: 1px solid #ddd;
         }
 
-        .transcripts-container {
-            border: 1px solid #ddd;
-            padding: 20px;
-            border-radius: 5px;
-            background-color: #f3f3f3;
-            margin-top: 20px;
-        }
-
-        .transcript {
-            border: 1px solid #ccc;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            background-color: #fff;
-        }
-
-        .transcript-title {
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
     </style>
+    <script>
+        // 優先更新 DOM 的內容
+        const userName = localStorage.getItem('userName');
+        if (userName) {
+            document.addEventListener('DOMContentLoaded', () => {
+                document.getElementById('toggleHeader').textContent = userName; // 更新名稱
+            });
+        }    
+        else{
+        // 保存用戶名稱到 sessionStorage
+        const userName = document.getElementById('toggleHeader').textContent.trim();
+        localStorage.setItem('userName', userName); 
+    }
+    </script>
 </head>
 <body>
     <header class="navbar">
