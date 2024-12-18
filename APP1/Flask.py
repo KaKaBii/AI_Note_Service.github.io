@@ -1,20 +1,20 @@
 # 環境依賴
 import os
 import gc
-import sqlite3
+import time
 import uuid
-import subprocess
+import sqlite3
 import asyncio
-import requests
 import logging
+import requests
+import subprocess
 import ailabs_asr.transcriber as t
 from datetime import datetime
 # from ailabs_asr.streaming import StreamingClient 
 from flask import Flask, render_template, request, jsonify
 from extension.gpt_classification import GPT_classification
 from ailabs_asr.types import ModelConfig, TranscriptionConfig
-from concurrent.futures import as_completed
-
+from concurrent.futures import as_completed, ThreadPoolExecutor, TimeoutError
 # AudioSegment.converter = r"C:\Users\h5073\AppData\Local\Programs\Python\ffmpeg\bin\ffmpeg.exe"
 
 app = Flask(__name__)
@@ -261,8 +261,16 @@ async def _convert(audio, result, api_key):
         result.append(task.result().transcript)
     return result
 
-# 語音轉文字模塊
-def transcribe_audio(file_path):
+# 包裝函數來控制超時
+def process_with_timeout(func, audio_data, timeout):
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(func, audio_data)
+        try:
+            return future.result(timeout=timeout)  # 設置超時
+        except TimeoutError:
+            return None
+
+def yating_api(file_path):
     """
     使用語音轉文字模塊來處理音頻文件，將音頻文件轉換為文本。
     """
@@ -306,10 +314,25 @@ def transcribe_audio(file_path):
     audio = response.json()["url"]
     transcript = []
     transcript = asyncio.run(_convert(audio, transcript, api_key))
+
+def whisper(file_path):
+    "https://11332-m4tqbwgn-northcentralus.cognitiveservices.azure.com/openai/deployments/AI_Design_whisper/audio/translations?api-version=2024-06-01"
+
+# 語音轉文字模塊( 雅婷 )
+def transcribe_audio(file_path):
+    transcript = process_with_timeout(yating_api, file_path, timeout=3)  # 設定超時 3 秒
+
+    if transcript is None:
+        # 如果第一個模塊超時，則使用第二個模塊
+        result = process_with_timeout(whisper, file_path, timeout=3)
+
+    # 如果兩個模塊都失敗，返回錯誤
+    if result is None:
+        raise TimeoutError
     
     return transcript
 
-# 
+# 將逐字稿分類
 def classify_contents(name, timestamp):
     command = "SELECT name, content FROM transcripts WHERE name = '{}' ORDER BY timestamp DESC LIMIT 1".format(name)
     print("Start GPT classification")
@@ -327,7 +350,7 @@ def classify_contents(name, timestamp):
         conn.close()
     except Exception as e: app.logger.error(f'Error: {e}')
 
-# 
+# 獲得分類後的逐字稿
 @app.route('/fetchClassifiedContent', methods=['GET'])
 def fetchClassifiedContent():
     # 從請求參數中獲取 person 和 category_type
@@ -360,31 +383,6 @@ def fetchClassifiedContent():
     except Exception as e:
         app.logger.error(f"Error fetching classified content for {person} and category {category_type}: {e}")
         return jsonify({'error': str(e)}), 500
-
-# 
-@app.route('/category/<category_type>', methods=['GET'])
-def classify_Togo(category_type):
-    # 假設我們根據 URL 參數中的分類類型來獲取分類內容
-    # 可以根據需求更改這裡獲取 'name' 的方式
-    name = request.args.get('name')  # 假設 'name' 也來自 URL 或查詢參數
-
-    if not name:
-        return jsonify({'error': 'No name provided'}), 400
-
-    try:
-        # 調用 fetchClassifiedContent 函數來獲取分類內容
-        content_data = fetchClassifiedContent()
-
-        # 如果有資料，渲染頁面並將分類內容傳遞給前端
-        if content_data:
-            return render_template('classTemplate.html', title=category_type.upper(), content_data=content_data)
-        else:
-            # 如果查無資料，顯示空的分類頁面
-            return render_template('classTemplate.html', title=category_type.upper(), content_data=[])
-
-    except Exception as e:
-        app.logger.error(f"Error occurred while fetching content for category {category_type}: {e}")
-        return "Internal Server Error", 500
 
 # 將逐字稿保存到資料庫
 def save_transcript_to_db(user, content):
