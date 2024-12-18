@@ -247,20 +247,6 @@ def ensure_audio_format(input_file, output_file=None):
         # 顯式釋放資源
         gc.collect()
 
-async def _convert(audio, result, api_key):
-    model = ModelConfig('asr-zh-tw-std')
-    config = TranscriptionConfig(True, True, 2, False)
-    c = t.Transcriber(api_key, model, config)
-    multiple_tasks = []
-    for _ in range(2):
-        transcript = c.transcribe(audio)
-        task = transcript.wait_for_completion_async()
-        multiple_tasks.append(task)
-
-    for task in as_completed(multiple_tasks):
-        result.append(task.result().transcript)
-    return result
-
 # 包裝函數來控制超時
 def process_with_timeout(func, audio_data, timeout):
     with ThreadPoolExecutor(max_workers=1) as executor:
@@ -270,11 +256,26 @@ def process_with_timeout(func, audio_data, timeout):
         except TimeoutError:
             return None
 
+# 雅婷語音轉文字模組
 def yating_api(file_path):
     """
     使用語音轉文字模塊來處理音頻文件，將音頻文件轉換為文本。
     """
+    
+    async def _convert(audio, result, api_key):
+        model = ModelConfig('asr-zh-tw-std')
+        config = TranscriptionConfig(True, True, 2, False)
+        c = t.Transcriber(api_key, model, config)
+        multiple_tasks = []
+        for _ in range(2):
+            transcript = c.transcribe(audio)
+            task = transcript.wait_for_completion_async()
+            multiple_tasks.append(task)
 
+        for task in as_completed(multiple_tasks):
+            result.append(task.result().transcript)
+        return result
+    
     # 獲取金鑰檔案
     current_dir = os.getcwd()
     key_file_path = os.path.join(current_dir, 'key.txt')
@@ -315,16 +316,17 @@ def yating_api(file_path):
     transcript = []
     transcript = asyncio.run(_convert(audio, transcript, api_key))
 
-def whisper(file_path):
+# whisper語音轉文字模組
+def whisper_api(file_path):
     "https://11332-m4tqbwgn-northcentralus.cognitiveservices.azure.com/openai/deployments/AI_Design_whisper/audio/translations?api-version=2024-06-01"
 
-# 語音轉文字模塊( 雅婷 )
+# 語音轉文字模塊
 def transcribe_audio(file_path):
     transcript = process_with_timeout(yating_api, file_path, timeout=3)  # 設定超時 3 秒
 
     if transcript is None:
         # 如果第一個模塊超時，則使用第二個模塊
-        result = process_with_timeout(whisper, file_path, timeout=3)
+        result = process_with_timeout(whisper_api, file_path, timeout=3)
 
     # 如果兩個模塊都失敗，返回錯誤
     if result is None:
