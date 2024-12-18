@@ -330,15 +330,15 @@ def classify_contents(name, timestamp):
 # 
 @app.route('/fetchClassifiedContent', methods=['GET'])
 def fetchClassifiedContent():
-    # 從請求中獲取分類類型參數和名字參數
-    category_type = request.args.get('category')
-    # 從 session 中獲取 person（之前在 fetchTranscripts 中儲存）
-    person = session.get('person')  # 從 session 中獲取儲存的名字
-    if not category_type or not person:
-        return jsonify({'error': 'No category or name provided'}), 400
+    # 從請求參數中獲取 person 和 category_type
+    person = request.args.get('person')  # 取得人名參數
+    category_type = request.args.get('type')  # 取得類型參數
 
     content_data = []  # 初始化 content_data 變數為空列表
     try:
+        if not person or not category_type:
+            return jsonify({'error': 'Missing required parameters: person or type'}), 400
+
         # 連接資料庫
         conn = sqlite3.connect(DATABASE)
         cursor = conn.cursor()
