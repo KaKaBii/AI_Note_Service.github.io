@@ -74,6 +74,16 @@ function navigateToRoot() {
     window.location.href = `/`;
 }
 
+// 總結報告
+function navigateToSummary() {
+    // 保存用戶名稱到 sessionStorage
+    const userName = document.getElementById('toggleHeader').textContent.trim();
+    sessionStorage.setItem('userName', userName); 
+
+    // 當點擊分類按鈕時，會導向對應的分類頁面
+    window.location.href = `summary`;
+}
+
 // 切換個案
 function SwitchIndivisual(name) {
     const toggleHeader = document.getElementById('toggleHeader');
@@ -142,6 +152,7 @@ async function refreshToggleList(){
         }
     } 
 }
+
 // 清單從後端源取按鈕
 function fetchNameList() {
     console.log('Fetching name list...');
@@ -183,9 +194,7 @@ function filterNameList() {
         } else {
             button.style.display = 'none';
         }
-
     });
-
 }
 
 // 用於獲取逐字稿的函數

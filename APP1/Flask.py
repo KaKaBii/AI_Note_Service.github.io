@@ -47,6 +47,11 @@ def index():
 def classify():
     return render_template('class.html')
 
+# 定義總結頁面
+@app.route('/summary')
+def summaryPage():
+    return render_template('summary.html')
+
 #定義身體頁面
 @app.route('/category/body')
 def bodyPage():
@@ -385,6 +390,40 @@ def fetchClassifiedContent():
     except Exception as e:
         app.logger.error(f"Error fetching classified content for {person} and category {category_type}: {e}")
         return jsonify({'error': str(e)}), 500
+
+# 獲得總結報告
+@app.route('/fetchSummaryContent', methods=['GET'])
+def fetchSummaryContent():
+    # 從請求參數中獲取 person
+    person = request.args.get('person')  # 取得人名參數
+
+    content_data = []  # 初始化 content_data 變數為空列表
+    try:
+        if not person:
+            return jsonify({'error': 'Missing required parameters: person or type'}), 400
+
+        # 連接資料庫
+        conn = sqlite3.connect(DATABASE)
+        cursor = conn.cursor()
+
+        # 根據名字和類型查詢資料
+        query = "SELECT content, time FROM ClosingReport WHERE name = ?"
+        cursor.execute(query, (person,))
+
+        # 獲取查詢結果
+        rows = cursor.fetchall()
+        content_data = [{'content': row[0], 'timestamp': row[1]} for row in rows]
+        conn.close()
+
+        # 日誌打印輸出的資料
+        app.logger.info(f"Summary content fetched for {person}: {content_data}")
+
+        return jsonify(content_data)
+
+    except Exception as e:
+        app.logger.error(f"Error fetching summary content for {person}: {e}")
+        return jsonify({'error': str(e)}), 500
+
 
 # 將逐字稿保存到資料庫
 def save_transcript_to_db(user, content):

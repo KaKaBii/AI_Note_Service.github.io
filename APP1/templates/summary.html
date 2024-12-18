@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>總結報告</title> <!-- 直接設置標題 -->
+    <link rel="stylesheet" href="../static/css/style.css">
+    <script>
+        // 優先更新 DOM 的內容
+        const userName = localStorage.getItem('userName');
+        if (userName) {
+            document.addEventListener('DOMContentLoaded', () => {
+                document.getElementById('toggleHeader').textContent = userName; // 更新名稱
+            });
+        }
+    </script>
+</head>
+<body>
+    <header  class="navbar">
+        <div class="left-section">
+            <img src="../static/images/profile/01.png" alt="頭像" class="avatar">
+            <div class="toggle-header orange" id="toggleHeader" onclick="toggleButtons()"></div>
+        </div>
+        <div class="right-section">
+            <div class="menu-toggle" id="menuToggle" onclick="toggleMenu()">&#9776;</div>
+        </div>
+    </header>
+    <!-- 下拉選單 -->
+    <div class="name-list" id="nameList1" style="display: none;">
+        <!-- 從資料庫中獲取的個案名 -->
+    </div>
+    <main>
+        <h1>總結報告</h1>
+        <div class="section" id="summaryContent-container">
+            
+        </div>
+        
+        <div class="controls">
+            <button onclick="goBack()" class="btn">返回</button>
+        </div>
+        
+    </main>
+    <script src="../static/js/summary.js"></script>
+</body>
+</html>
