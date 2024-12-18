@@ -326,10 +326,10 @@ def transcribe_audio(file_path):
 
     if transcript is None:
         # 如果第一個模塊超時，則使用第二個模塊
-        result = process_with_timeout(whisper_api, file_path, timeout=3)
+        transcript = process_with_timeout(whisper_api, file_path, timeout=3)
 
     # 如果兩個模塊都失敗，返回錯誤
-    if result is None:
+    if transcript is None:
         raise TimeoutError
     
     return transcript
