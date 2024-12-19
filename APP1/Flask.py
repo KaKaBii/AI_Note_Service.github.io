@@ -435,8 +435,10 @@ def fetchContent(name):
         conn = sqlite3.connect(DATABASE)
         cursor = conn.cursor()
         timestamp = datetime.now()
-        query = "SELECT name, type, content, timestamp FROM GPT_ClassificationResults WHERE name = '{}' AND timestamp LIKE '{}-{}%' ORDER BY timestamp".format(name, timestamp.year, timestamp.month)
-        cursor.execute(query)
+
+        query = "SELECT name, type, content, timestamp FROM GPT_ClassificationResults WHERE name = ? AND timestamp LIKE ? ORDER BY timestamp"
+        formatted_timestamp = f"{timestamp.year}-{timestamp.month}%"
+        cursor.execute(query, (name, formatted_timestamp))
         rows = cursor.fetchall()
         transcripts = [{'user': row[0], 'type': row[1], 'content': row[2], 'timestamp': row[3]} for row in rows]
         unique_dates = sorted([date for date in {datetime.strptime(transcript["timestamp"], "%Y-%m-%d %H:%M:%S").date() for transcript in transcripts}])
