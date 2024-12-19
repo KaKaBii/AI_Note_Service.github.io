@@ -13,8 +13,10 @@ from datetime import datetime
 # from ailabs_asr.streaming import StreamingClient 
 from flask import Flask, render_template, request, jsonify
 from extension.gpt_classification import GPT_classification
+from extension.closingReportOutput import ClosingReportOutput
 from ailabs_asr.types import ModelConfig, TranscriptionConfig
 from concurrent.futures import as_completed, ThreadPoolExecutor, TimeoutError
+
 # AudioSegment.converter = r"C:\Users\h5073\AppData\Local\Programs\Python\ffmpeg\bin\ffmpeg.exe"
 
 app = Flask(__name__)
@@ -34,6 +36,7 @@ for folder in [DATABASE_FOLDER, UPLOAD_FOLDER]:
 
 # 設定允許的檔案類型
 ALLOWED_EXTENSIONS = {'mp3', 'aac', 'flac', 'ogg', 'wav', 'm4a'}
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -317,9 +320,11 @@ def yating_api(file_path):
     response = requests.post('https://asr.api.yating.tw/v1/uploads',
                              headers=headers,
                              files=files)
+    print(response)
     audio = response.json()["url"]
     transcript = []
     transcript = asyncio.run(_convert(audio, transcript, api_key))
+    return transcript
 
 # whisper語音轉文字模組
 def whisper_api(file_path):
@@ -396,6 +401,7 @@ def fetchClassifiedContent():
 def fetchSummaryContent():
     # 從請求參數中獲取 person
     person = request.args.get('person')  # 取得人名參數
+    fetchContent(person)
 
     content_data = []  # 初始化 content_data 變數為空列表
     try:
@@ -424,6 +430,62 @@ def fetchSummaryContent():
         app.logger.error(f"Error fetching summary content for {person}: {e}")
         return jsonify({'error': str(e)}), 500
 
+def fetchContent(name):
+    try:
+        conn = sqlite3.connect(DATABASE)
+        cursor = conn.cursor()
+        timestamp = datetime.now()
+        query = "SELECT name, type, content, timestamp FROM GPT_ClassificationResults WHERE name = '{}' AND timestamp LIKE '{}-{}%' ORDER BY timestamp".format(name, timestamp.year, timestamp.month)
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        transcripts = [{'user': row[0], 'type': row[1], 'content': row[2], 'timestamp': row[3]} for row in rows]
+        unique_dates = sorted([date for date in {datetime.strptime(transcript["timestamp"], "%Y-%m-%d %H:%M:%S").date() for transcript in transcripts}])
+        unique_types = {transcript["type"] for transcript in transcripts}
+        chatContent = "{}\n".format(name)
+        for type in unique_types:
+            chatContent += "{}\n".format(type)
+            for date in unique_dates:
+                chatContent += "{}\n".format(date)
+                for transcript in transcripts:
+                    if transcript["type"] == type and datetime.strptime(transcript["timestamp"], "%Y-%m-%d %H:%M:%S").date() == date:
+                        chatContent += "{}\n".format(transcript["content"])
+        cursor.execute("INSERT INTO ClosingReport VALUES ('{}', '{}-{}', '{}')".format(name, timestamp.year, timestamp.month, ClosingReportOutput(chatContent)))
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        print(e)
+        app.logger.error(f"Error occurred while fetching content for category {category_type}: {e}")
+        return "Internal Server Error", 500
+
+# @app.route('/category/<category_type>', methods=['GET'])
+# def classify_Togo(category_type):
+#     # 假設我們根據 URL 參數中的分類類型來獲取分類內容
+#     # 可以根據需求更改這裡獲取 'name' 的方式
+#     """ original code
+#     # name = request.args.get('name')  # 假設 'name' 也來自 URL 或查詢參數
+
+#     # if not name:
+#     #     return jsonify({'error': 'No name provided'}), 400
+#     """
+
+#     ### test code
+#     name = "測試機器人"
+#     ###
+
+#     try:
+#         # 調用 fetchClassifiedContent 函數來獲取分類內容
+#         content_data = fetchContent(name)
+
+#         # 如果有資料，渲染頁面並將分類內容傳遞給前端
+#         if content_data:
+#             return render_template('classTemplate.html', title=category_type.upper(), content_data=content_data)
+#         else:
+#             # 如果查無資料，顯示空的分類頁面
+#             return render_template('classTemplate.html', title=category_type.upper(), content_data=[])
+
+#     except Exception as e:
+#         app.logger.error(f"Error occurred while fetching content for category {category_type}: {e}")
+#         return "Internal Server Error", 500
 
 # 將逐字稿保存到資料庫
 def save_transcript_to_db(user, content):
