@@ -454,7 +454,7 @@ def fetchContent(name):
         conn.close()
     except Exception as e:
         print(e)
-        app.logger.error(f"Error occurred while fetching content for category {category_type}: {e}")
+        app.logger.error(f"Error occurred while fetching content: {e}")
         return "Internal Server Error", 500
 
 # @app.route('/category/<category_type>', methods=['GET'])
