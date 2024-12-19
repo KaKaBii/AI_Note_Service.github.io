@@ -10,7 +10,7 @@ import requests
 import subprocess
 import ailabs_asr.transcriber as t
 from datetime import datetime
-# from ailabs_asr.streaming import StreamingClient 
+from ailabs_asr.streaming import StreamingClient 
 from flask import Flask, render_template, request, jsonify
 from extension.gpt_classification import GPT_classification
 from extension.closingReportOutput import ClosingReportOutput
@@ -256,13 +256,12 @@ def ensure_audio_format(input_file, output_file=None):
         gc.collect()
 
 # 包裝函數來控制超時
-def process_with_timeout(func, audio_data, timeout):
-    with ThreadPoolExecutor(max_workers=1) as executor:
-        future = executor.submit(func, audio_data)
-        try:
-            return future.result(timeout=timeout)  # 設置超時
-        except TimeoutError:
-            return None
+async def process_with_timeout(func, audio_data, timeout):
+    try:  
+        await asyncio.wait_for(func(audio_data), timeout)  
+    except asyncio.TimeoutError:  
+        print(f"Function exceeded {timeout} seconds. Terminating...")  
+        await another_function()
 
 # 雅婷語音轉文字模組
 def yating_api(file_path):
@@ -271,17 +270,20 @@ def yating_api(file_path):
     """
     
     async def _convert(audio, result, api_key):
-        model = ModelConfig('asr-zh-tw-std')
-        config = TranscriptionConfig(True, True, 2, False)
-        c = t.Transcriber(api_key, model, config)
-        multiple_tasks = []
-        for _ in range(2):
-            transcript = c.transcribe(audio)
-            task = transcript.wait_for_completion_async()
-            multiple_tasks.append(task)
+        try:
+            model = ModelConfig('asr-zh-tw-std')
+            config = TranscriptionConfig(True, True, 2, False)
+            c = t.Transcriber(api_key, model, config)
+            multiple_tasks = []
+            for _ in range(2):
+                transcript = c.transcribe(audio)
+                task = transcript.wait_for_completion_async()
+                multiple_tasks.append(task)
 
-        for task in as_completed(multiple_tasks):
-            result.append(task.result().transcript)
+            for task in as_completed(multiple_tasks):
+                result.append(task.result().transcript)
+        except asyncio.CancelledError:
+            print("Conversion was cancelled.") 
         return result
     
     # 獲取金鑰檔案
@@ -323,26 +325,60 @@ def yating_api(file_path):
     print(response)
     audio = response.json()["url"]
     transcript = []
-    transcript = asyncio.run(_convert(audio, transcript, api_key))
+    # transcript = asyncio.run(_convert(audio, transcript, api_key))
+    transcript = asyncio.get_event_loop().create_task(_convert(audio, transcript, api_key))
     return transcript
 
-# whisper語音轉文字模組
-def whisper_api(file_path):
-    "https://11332-m4tqbwgn-northcentralus.cognitiveservices.azure.com/openai/deployments/AI_Design_whisper/audio/translations?api-version=2024-06-01"
+# 雅婷即時語音轉文字模組
+def yating_runtime_api(file_path):
+    # 獲取金鑰檔案
+    current_dir = os.getcwd()
+    key_file_path = os.path.join(current_dir, 'key.txt')
+    
+    if not os.path.exists(key_file_path):
+        raise FileNotFoundError(f"檔案 '{key_file_path}' 不存在，請檢查檔案路徑或內容！")
+
+    # 繼續讀取金鑰
+    with open(key_file_path, 'r') as file:
+        api_key = file.read().strip()
+        if api_key == "" or None:
+            raise FileNotFoundError(f"金鑰為空！")
+
+    transcript = []
+    def on_processing_sentence(message):
+        print(f'hello: {message["asr_sentence"]}')
+
+    def on_final_sentence(message):
+        transcript.append(message["asr_sentence"])
+        #print(f'world: {message["asr_sentence"]}')
+        
+    asr_client = StreamingClient(key=api_key)
+
+    # 開始語音轉文字處理
+    asr_client.start_streaming_wav(
+        pipeline='asr-zh-tw-std',
+        file=file_path,
+        #on_processing_sentence=on_processing_sentence,
+        on_final_sentence=on_final_sentence
+    )
+    return transcript
 
 # 語音轉文字模塊
 def transcribe_audio(file_path):
-    transcript = process_with_timeout(yating_api, file_path, timeout=3)  # 設定超時 3 秒
+    transcript = asyncio.run(process_with_timeout(yating_api, file_path, timeout=60))  # 設定超時 60 秒
+    transcribeMode = 0
 
     if transcript is None:
         # 如果第一個模塊超時，則使用第二個模塊
-        transcript = process_with_timeout(whisper_api, file_path, timeout=3)
+        transcript = asyncio.run(process_with_timeout(yating_runtime_api, file_path, timeout=60))
+        transcribeMode = 1
 
     # 如果兩個模塊都失敗，返回錯誤
     if transcript is None:
+        transcribeMode = 2
         raise TimeoutError
     
-    return transcript
+    return transcript, transcribeMode
 
 # 將逐字稿分類
 def classify_contents(name, timestamp):
@@ -435,8 +471,10 @@ def fetchContent(name):
         conn = sqlite3.connect(DATABASE)
         cursor = conn.cursor()
         timestamp = datetime.now()
-        query = "SELECT name, type, content, timestamp FROM GPT_ClassificationResults WHERE name = '{}' AND timestamp LIKE '{}-{}%' ORDER BY timestamp".format(name, timestamp.year, timestamp.month)
-        cursor.execute(query)
+
+        query = "SELECT name, type, content, timestamp FROM GPT_ClassificationResults WHERE name = ? AND timestamp LIKE ? ORDER BY timestamp"
+        formatted_timestamp = f"{timestamp.year}-{timestamp.month}%"
+        cursor.execute(query, (name, formatted_timestamp))
         rows = cursor.fetchall()
         transcripts = [{'user': row[0], 'type': row[1], 'content': row[2], 'timestamp': row[3]} for row in rows]
         unique_dates = sorted([date for date in {datetime.strptime(transcript["timestamp"], "%Y-%m-%d %H:%M:%S").date() for transcript in transcripts}])
@@ -454,7 +492,7 @@ def fetchContent(name):
         conn.close()
     except Exception as e:
         print(e)
-        app.logger.error(f"Error occurred while fetching content for category {category_type}: {e}")
+        app.logger.error(f"Error occurred while fetching content: {e}")
         return "Internal Server Error", 500
 
 # @app.route('/category/<category_type>', methods=['GET'])
@@ -548,16 +586,24 @@ def upload_record():
 
         print("正在轉換逐字稿......")
         contentList = []
-        contents = transcribe_audio(converted_file_path)
+        contents, transcribeMode = transcribe_audio(converted_file_path)
         print("轉換完成")
-        # print(contents[0])
-        for i in range(len(contents[0])):
-            if contents[0][i]['speakerId'] == "0":
-                contentList.append("{}：{}".format("講者１", contents[0][i]['sentence']))
-                print("{}：{}".format("講者１", contents[0][i]['sentence']))
-            else:
-                contentList.append("{}：{}".format("講者２", contents[0][i]['sentence']))
-                print("{}：{}".format("講者２", contents[0][i]['sentence']))
+        if transcribeMode == 0:
+            for i in range(len(contents[0])):
+                if contents[0][i]['speakerId'] == "0":
+                    contentList.append("{}：{}".format("講者１", contents[0][i]['sentence']))
+                    print("{}：{}".format("講者１", contents[0][i]['sentence']))
+                else:
+                    contentList.append("{}：{}".format("講者２", contents[0][i]['sentence']))
+                    print("{}：{}".format("講者２", contents[0][i]['sentence']))
+        elif transcribeMode == 1:
+            for i in range(len(contents)):
+                if i%2==1:
+                    contentList.append("{}：{}".format("講者１", contents[i]))
+                    print("{}：{}".format("講者１", contents[i]))
+                else:
+                     contentList.append("{}：{}".format("講者２", contents[i]))
+                     print("{}：{}".format("講者２", contents[i]))
   
         user = request.form.get('user')
         
