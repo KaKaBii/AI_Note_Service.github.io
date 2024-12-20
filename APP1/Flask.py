@@ -420,8 +420,16 @@ def fetchClassifiedContent():
 
         # 獲取查詢結果
         rows = cursor.fetchall()
-        content_data = [{'content': row[0], 'timestamp': row[1]} for row in rows]
+        content_datas = [{'content': row[0], 'timestamp': row[1]} for row in rows]
         conn.close()
+        unique_dates = sorted([date for date in {datetime.strptime(data["timestamp"], "%Y-%m-%d %H:%M:%S") for data in content_datas}])
+        content_data = []
+        for unique_date in unique_dates:
+            content = ""
+            for data in content_datas:
+                if datetime.strptime(data["timestamp"], "%Y-%m-%d %H:%M:%S") == unique_date:
+                    content += "{}\n".format(data["content"])
+            content_data.append({'content': content, 'timestamp': unique_date.strftime("%Y-%m-%d %H:%M:%S")})
 
         # 日誌打印輸出的資料
         app.logger.info(f"Classified content fetched for {person} and category {category_type}: {content_data}")
@@ -484,9 +492,15 @@ def fetchContent(name):
             chatContent += "{}\n".format(type)
             for date in unique_dates:
                 chatContent += "{}\n".format(date)
+                isContent = False
                 for transcript in transcripts:
-                    if transcript["type"] == type and datetime.strptime(transcript["timestamp"], "%Y-%m-%d %H:%M:%S").date() == date:
-                        chatContent += "{}\n".format(transcript["content"])
+                    if transcript["type"] == type and datetime.strptime(transcript["timestamp"], "%Y-%m-%d %H:%M:%S").date() == date and datetime.strptime(transcript["timestamp"], "%Y-%m-%d %H:%M:%S").date().month == timestamp.month:
+                        if transcript["content"] != None:
+                            chatContent += "{}\n".format(transcript["content"])
+                            isContent = True
+                if isContent == False:
+                    chatContent += "空白\n"
+        print(chatContent)
         cursor.execute("INSERT INTO ClosingReport VALUES ('{}', '{}-{}', '{}')".format(name, timestamp.year, timestamp.month, ClosingReportOutput(chatContent)))
         conn.commit()
         conn.close()
