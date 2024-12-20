@@ -123,17 +123,18 @@ function SwitchIndivisual(name) {
 } 
 
 async function refreshToggleList(){
-    const categoryType = ['身', '心', '社會', '特殊', '其他'];
+    const categoryType = ["", '身', '心', '社會', '特殊', '其他'];
     for (let i=1; i<=5; i++){
         
         const container = document.getElementById(`transcripts-container-${i}`);
         if (container) {
             if (container.style.display != 'none') {
                 try {
+
                     // 等待分類內容數據加載
                     const personName = document.getElementById('toggleHeader').textContent.trim();
                     const data = await fetchClassifiedContent(personName, categoryType[i]);
-                    
+
                     // 根據 data 動態新增逐字稿內容
                     container.innerHTML = ''; // 清空原有內容
                     if (data.length > 0) {
@@ -586,10 +587,10 @@ function deleteTranscript(timestamp) {
 
 function uploadSpecialTranscript(){
     console.log('Uploading Special Content...');
-    transcriptObj = document.getElementById('transcript-input');
+    const transcriptInput = document.getElementById('transcript-input');
     const personName = document.getElementById('toggleHeader').textContent.trim();
-    Content = transcriptObj.value.trim();
-    if (transcriptObj.content !== null) {
+    Content = transcriptInput.value.trim();
+    if (Content) {
         fetch('/uploadSpecialTranscript', {
             method: 'POST',
             headers: {
@@ -604,6 +605,7 @@ function uploadSpecialTranscript(){
             if (response.ok) {
                 console.log('Special transcript successfully upload');
                 alert('上傳成功');
+                refreshToggleList();
             } else {
                 console.error('Failed to upload Special transcript');
                 alert('上傳上傳失敗，請重試');
@@ -613,5 +615,9 @@ function uploadSpecialTranscript(){
             console.error('Error uploading transcript:', error);
             alert('上傳過程中發生錯誤，請重試');
         });
+    
+    }
+    else{
+        alert('請輸入內容後再上傳');
     }
 }
