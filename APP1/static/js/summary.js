@@ -152,7 +152,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function fetchMonthList() {
     console.log('Fetching month list...');
-    fetch('/fetchMonthList')
+    const userName = document.getElementById('toggleHeader').textContent.trim();
+    fetch(`/fetchMonthList?person=${encodeURIComponent(userName)}`)
         .then(response => response.json())
             .then(data => {
                 console.log('Month list fetched:', data);

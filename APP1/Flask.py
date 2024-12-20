@@ -83,11 +83,16 @@ def extraPage():
 # 查詢月份列表
 @app.route('/fetchMonthList', methods=['GET']) 
 def fetchMonthList():
+    person = request.args.get('person')  # 從請求中獲取人名參數
+
+    if not person:
+        return jsonify({'error': 'No person provided'}), 400
+
     try:
         # 使用 with 語句管理資料庫連線
         with sqlite3.connect(DATABASE) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT DISTINCT strftime('%Y-%m', timestamp) FROM GPT_ClassificationResults ORDER BY timestamp")  # 假設表格名稱為 'GPT_ClassificationResults'，字段名稱為 'timestamp'
+            cursor.execute("SELECT DISTINCT strftime('%Y-%m', timestamp) FROM GPT_ClassificationResults WHERE name = ? ORDER BY timestamp", (person,))  # 假設表格名稱為 'GPT_ClassificationResults'，字段名稱為 'timestamp'
             months = [row[0] for row in cursor.fetchall()]
 
         return jsonify(months)
