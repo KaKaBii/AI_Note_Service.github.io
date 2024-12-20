@@ -51,6 +51,27 @@ async function toggleList(containerId, categoryType) {
                 else {
                     container.innerHTML = '<p>未找到符合條件的逐字稿。</p>';
                 }
+                if (categoryType == "特殊"){
+                    // 添加輸入框和上傳按鈕的包裝區塊
+                    const inputContainer = document.createElement('div');
+                    inputContainer.className = 'filter-input';
+                    // 輸入框
+                    const transcriptInput = document.createElement('textarea');
+                    transcriptInput.id = 'transcript-input';
+                    transcriptInput.placeholder = '輸入內容...';
+                    transcriptInput.className = 'transcript-input';
+                    inputContainer.appendChild(transcriptInput);
+
+                    // 上傳按鈕
+                    const uploadButton = document.createElement('button');
+                    uploadButton.textContent = '上傳';
+                    uploadButton.className = 'btn upload-button blue';
+                    uploadButton.onclick = uploadSpecialTranscript;
+                    inputContainer.appendChild(uploadButton);
+
+                    container.appendChild(inputContainer);
+                }
+
             container.style.display = 'block'; // 顯示列表
             } 
             catch (error) {
@@ -139,9 +160,30 @@ async function refreshToggleList(){
     
                             container.appendChild(transcriptDiv);
                         })
+
                     }
                     else {
                         container.innerHTML = '<p>未找到符合條件的逐字稿。</p>';
+                    }
+                    if (categoryType[i] == "特殊"){
+                        // 添加輸入框和上傳按鈕的包裝區塊
+                        const inputContainer = document.createElement('div');
+                        inputContainer.className = 'filter-input';
+                        // 輸入框
+                        const transcriptInput = document.createElement('textarea');
+                        transcriptInput.id = 'transcript-input';
+                        transcriptInput.placeholder = '輸入內容...';
+                        transcriptInput.className = 'transcript-input';
+                        inputContainer.appendChild(transcriptInput);
+
+                        // 上傳按鈕
+                        const uploadButton = document.createElement('button');
+                        uploadButton.textContent = '上傳';
+                        uploadButton.className = 'btn upload-button blue';
+                        uploadButton.onclick = uploadSpecialTranscript;
+                        inputContainer.appendChild(uploadButton);
+
+                        container.appendChild(inputContainer);
                     }
                 }
                 catch (error) {
@@ -542,3 +584,34 @@ function deleteTranscript(timestamp) {
     }
 }
 
+function uploadSpecialTranscript(){
+    console.log('Uploading Special Content...');
+    transcriptObj = document.getElementById('transcript-input');
+    const personName = document.getElementById('toggleHeader').textContent.trim();
+    Content = transcriptObj.value.trim();
+    if (transcriptObj.content !== null) {
+        fetch('/uploadSpecialTranscript', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: personName,
+                content: Content
+            })
+        })
+        .then(response => {
+            if (response.ok) {
+                console.log('Special transcript successfully upload');
+                alert('上傳成功');
+            } else {
+                console.error('Failed to upload Special transcript');
+                alert('上傳上傳失敗，請重試');
+            }
+        })
+        .catch(error => {
+            console.error('Error uploading transcript:', error);
+            alert('上傳過程中發生錯誤，請重試');
+        });
+    }
+}

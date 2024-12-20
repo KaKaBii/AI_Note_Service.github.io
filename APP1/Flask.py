@@ -156,6 +156,15 @@ def fetchTranscripts():
         return jsonify({'error': str(e)}), 500
 
 # 新增指定人名的逐字稿
+@app.route('/uploadSpecialTranscript', methods=['POST'])
+def uploadSpecialTranscript():
+    data = request.get_json()
+    name = data.get('name')
+    content = data.get('content')
+    save_special_to_db(name, content)
+    return jsonify({'message': 'Transcript uploaded successfully'}), 200
+
+# 新增指定人名的特殊分類內容
 @app.route('/uploadTranscript', methods=['POST'])
 def uploadTranscript():
     data = request.get_json()
@@ -646,6 +655,29 @@ def save_transcript_to_db(user, content):
         app.logger.error(f'Error uploading transcript for {user}: {e}')
         return jsonify({'error': str(e)}), 500
 
+# 將逐字稿保存到資料庫
+def save_special_to_db(user, content):
+    """
+    將特殊內容保存到資料庫中。
+    """
+    try:
+        conn = sqlite3.connect(DATABASE)
+        cursor = conn.cursor()
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        if not user or not content:
+            app.logger.error('Name or content is missing in the request')
+            return jsonify({'error': 'Name or content is missing'}), 400
+        
+        cursor.execute("INSERT INTO GPT_ClassificationResults (name, type, content, timestamp) VALUES (?, ?, ?, ?)", (user, "特殊", content, timestamp))
+        
+        conn.commit()
+        conn.close()
+        print(f"特殊內容已成功儲存到資料庫，使用者：{user}")
+        app.logger.info(f'Transcript uploaded for {user} at {timestamp}')
+    except Exception as e:
+        app.logger.error(f'Error uploading transcript for {user}: {e}')
+        return jsonify({'error': str(e)}), 500
+    
 # 上傳錄音檔
 @app.route('/uploadRecord', methods=['POST'])
 def upload_record():
