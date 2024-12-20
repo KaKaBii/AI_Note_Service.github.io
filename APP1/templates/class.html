@@ -24,9 +24,6 @@
             
             <div class="toggle-header orange" id="toggleHeader" onclick="toggleButtons()"></div>
         </div>
-        <div class="right-section">
-            <div class="menu-toggle" id="menuToggle" onclick="toggleMenu()">&#9776;</div>
-        </div>
     </header>
     <!-- 下拉選單 -->
     <div class="name-list" id="nameList1" style="display: none;">
@@ -55,20 +52,21 @@
                 <!-- 從資料庫中獲取的多份逐字稿 -->
             </div>
 
-            <div class="category-btn green" onclick="toggleList('transcripts-container-4', '特殊')">
-                特殊
-            </div>
-            <div class="classtranscripts-container" id="transcripts-container-4" style="display: none;">
-                <!-- 從資料庫中獲取的多份逐字稿 -->
-            </div>
 
-            <div class="category-btn blue" onclick="toggleList('transcripts-container-5', '其他')">
+
+            <div class="category-btn green" onclick="toggleList('transcripts-container-5', '其他')">
                 其他
             </div>
             <div class="classtranscripts-container" id="transcripts-container-5" style="display: none;">
                 <!-- 從資料庫中獲取的多份逐字稿 -->
             </div>
 
+            <div class="category-btn blue" onclick="toggleList('transcripts-container-4', '特殊')">
+                特殊
+            </div>
+            <div class="classtranscripts-container" id="transcripts-container-4" style="display: none;">
+                <!-- 從資料庫中獲取的多份逐字稿 -->
+            </div>
             <!-- <button  class="category-btn orange">心</button>
             <button  class="category-btn yellow">社會</button>
             <button  class="category-btn green">特殊</button>
