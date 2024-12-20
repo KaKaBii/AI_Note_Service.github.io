@@ -57,7 +57,9 @@
 <body>
     <header class="navbar">
         <div class="left-section">
-            <img src="../static/images/profile/01.png" alt="頭像" class="avatar">
+            <a href="{{ url_for('index') }}" >
+                <img src="../static/images/profile/01.png" alt="頭像" class="avatar">
+            </a> 
             <div class="toggle-header orange" id="toggleHeader" onclick="toggleButtons()">張偉</div>
         </div>
         <div class="right-section">
