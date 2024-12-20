@@ -351,10 +351,23 @@ header {
 }
 
 .avatar {
-  width: 40px;
-  height: 40px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   margin-right: 10px;
+  transition: all 0.3s ease; /* 添加過渡效果 */
+  background-color: #fff;
+}
+
+.avatar:hover {
+  width: 70px;
+  height: 70px;
+}
+
+.avatar:active {
+  opacity: 0.5; /* 透明度減少 30% */
+  background-color: #9f9d9d;
+
 }
 
 .toggle-header {
