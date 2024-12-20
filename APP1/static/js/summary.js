@@ -10,6 +10,25 @@ function toggleButtons() {
     }
 }
   
+// 月分清單從後端獲取
+// function fetchMonthList() {
+//     console.log('Fetching month list...');
+//     fetch('/fetchMonthList')
+//         .then(response => response.json())
+//             .then(data => {
+//                 console.log('Month list fetched:', data);
+//                 const monthList = document.getElementById('monthList');
+//                 if (monthList) {
+//                     data.forEach(month => {
+//                         const label = document.createElement('label');
+//                         label.textContent = month;
+//                         monthList.appendChild(label);
+//                     });
+//                 }
+//             })
+//         .catch(error => console.error('Error fetching name list:', error));
+// }
+
 // 清單從後端源取按鈕
 function fetchNameList() {
     console.log('Fetching name list...');
@@ -125,8 +144,62 @@ function fetchSummaryContent() {
 
 // 當頁面加載時獲取逐字稿列表
 document.addEventListener('DOMContentLoaded', () => {
+    // fetchSummaryContent();
+    fetchMonthList();
+    // 更新總結報告
     fetchSummaryContent();
 });
+
+function fetchMonthList() {
+    console.log('Fetching month list...');
+    fetch('/fetchMonthList')
+        .then(response => response.json())
+            .then(data => {
+                console.log('Month list fetched:', data);
+                const monthList = document.getElementById('monthList');
+                if (monthList) {
+                    data.forEach(month => {
+                        const label = document.createElement('option');
+                        label.textContent = month;
+                        monthList.appendChild(label);
+                    });
+                }
+            })
+        .catch(error => console.error('Error fetching name list:', error));
+}
+
+function generateSummary(name, month){
+    console.log('Generating summary for:', name, month);
+    fetch(`/generateSummaryContent?person=${encodeURIComponent(name)}&month=${encodeURIComponent(month)}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to generate summary');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Summary generated:', data);
+            alert('總結報告已生成');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('生成總結報告時發生錯誤');
+        });
+}
+
+function submitForm() {
+    const monthList = document.getElementById('monthList');
+    const selectedMonth = monthList.options[monthList.selectedIndex];
+    const name = document.getElementById('toggleHeader').textContent.trim();
+    if (selectedMonth && selectedMonth.value) {
+        console.log('Submitting form for month:', selectedMonth.textContent);
+        generateSummary(name, selectedMonth.textContent);
+        fetchSummaryContent();
+
+    } else {
+        alert('請選擇一個月份');
+    }
+}
 
 function goBack() {
     window.history.back();

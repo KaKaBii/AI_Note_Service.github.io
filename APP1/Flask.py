@@ -80,6 +80,21 @@ def specialPage():
 def extraPage():
    return render_template('classTemplate.html', title = "EXTRA")
 
+# 查詢月份列表
+@app.route('/fetchMonthList', methods=['GET']) 
+def fetchMonthList():
+    try:
+        # 使用 with 語句管理資料庫連線
+        with sqlite3.connect(DATABASE) as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT DISTINCT strftime('%Y-%m', timestamp) FROM GPT_ClassificationResults ORDER BY timestamp")  # 假設表格名稱為 'GPT_ClassificationResults'，字段名稱為 'timestamp'
+            months = [row[0] for row in cursor.fetchall()]
+
+        return jsonify(months)
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 # 查詢姓名列表
 @app.route('/fetchNameList', methods=['GET']) 
 def fetchNameList():
@@ -261,7 +276,7 @@ async def process_with_timeout(func, audio_data, timeout):
         await asyncio.wait_for(func(audio_data), timeout)  
     except asyncio.TimeoutError:  
         print(f"Function exceeded {timeout} seconds. Terminating...")  
-        await another_function()
+        # await another_function()
 
 # 雅婷語音轉文字模組
 def yating_api(file_path):
@@ -445,7 +460,43 @@ def fetchClassifiedContent():
 def fetchSummaryContent():
     # 從請求參數中獲取 person
     person = request.args.get('person')  # 取得人名參數
-    fetchContent(person)
+    # fetchContent(person)
+
+    content_data = []  # 初始化 content_data 變數為空列表
+    try:
+        if not person:
+            return jsonify({'error': 'Missing required parameters: person or type'}), 400
+
+        # 連接資料庫
+        conn = sqlite3.connect(DATABASE)
+        cursor = conn.cursor()
+
+        # 根據名字和類型查詢資料
+        query = "SELECT content, time FROM ClosingReport WHERE name = ?"
+        cursor.execute(query, (person,))
+
+        # 獲取查詢結果
+        rows = cursor.fetchall()
+        content_data = [{'content': row[0], 'timestamp': row[1]} for row in rows]
+        conn.close()
+
+        # 日誌打印輸出的資料
+        app.logger.info(f"Summary content fetched for {person}: {content_data}")
+
+        return jsonify(content_data)
+
+    except Exception as e:
+        app.logger.error(f"Error fetching summary content for {person}: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+# 獲得總結報告
+@app.route('/generateSummaryContent', methods=['GET'])
+def generateSummaryContent():
+    # 從請求參數中獲取 person
+    person = request.args.get('person')  # 取得人名參數
+    month = request.args.get('month')  # 取得月份參數
+    fetchContent(person, month)
 
     content_data = []  # 初始化 content_data 變數為空列表
     try:
@@ -508,7 +559,41 @@ def fetchContent(name):
         print(e)
         app.logger.error(f"Error occurred while fetching content: {e}")
         return "Internal Server Error", 500
+    
+def fetchContent(name, month):
+    try:
+        conn = sqlite3.connect(DATABASE)
+        cursor = conn.cursor()
+        timestamp = datetime.now()
 
+        query = "SELECT name, type, content, timestamp FROM GPT_ClassificationResults WHERE name = ? AND strftime('%Y-%m', timestamp) = ? ORDER BY timestamp"
+        formatted_timestamp = month
+        cursor.execute(query, (name, formatted_timestamp))
+        rows = cursor.fetchall()
+        transcripts = [{'user': row[0], 'type': row[1], 'content': row[2], 'timestamp': row[3]} for row in rows]
+        unique_dates = sorted([date for date in {datetime.strptime(transcript["timestamp"], "%Y-%m-%d %H:%M:%S").date() for transcript in transcripts}])
+        unique_types = {transcript["type"] for transcript in transcripts}
+        chatContent = "{}\n".format(name)
+        for type in unique_types:
+            chatContent += "{}\n".format(type)
+            for date in unique_dates:
+                chatContent += "{}\n".format(date)
+                isContent = False
+                for transcript in transcripts:
+                    if transcript["type"] == type and datetime.strptime(transcript["timestamp"], "%Y-%m-%d %H:%M:%S").date() == date and datetime.strptime(transcript["timestamp"], "%Y-%m-%d %H:%M:%S").date().month == timestamp.month:
+                        if transcript["content"] != None:
+                            chatContent += "{}\n".format(transcript["content"])
+                            isContent = True
+                if isContent == False:
+                    chatContent += "空白\n"
+        print(chatContent)
+        cursor.execute("INSERT INTO ClosingReport VALUES ('{}', '{}-{}', '{}')".format(name, timestamp.year, timestamp.month, ClosingReportOutput(chatContent)))
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        print(e)
+        app.logger.error(f"Error occurred while fetching content: {e}")
+        return "Internal Server Error", 500
 # @app.route('/category/<category_type>', methods=['GET'])
 # def classify_Togo(category_type):
 #     # 假設我們根據 URL 參數中的分類類型來獲取分類內容

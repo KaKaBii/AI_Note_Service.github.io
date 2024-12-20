@@ -21,9 +21,9 @@
             <img src="../static/images/profile/01.png" alt="頭像" class="avatar">
             <div class="toggle-header orange" id="toggleHeader" onclick="toggleButtons()"></div>
         </div>
-        <div class="right-section">
+        <!-- <div class="right-section">
             <div class="menu-toggle" id="menuToggle" onclick="toggleMenu()">&#9776;</div>
-        </div>
+        </div> -->
     </header>
     <!-- 下拉選單 -->
     <div class="name-list" id="nameList1" style="display: none;">
@@ -31,6 +31,14 @@
     </div>
     <main>
         <h1>總結報告</h1>
+        <!-- 新增的下拉式表單及按鈕 -->
+        <div class="form-section">
+            <label for="dropdown">選擇月份:</label>
+            <select id="monthList">
+            <!-- 從資料庫中獲取的月份 -->
+            </select>
+            <button onclick="submitForm()" class="btn">生成結報</button>
+        </div>
         <div class="section" id="summaryContent-container">
             
         </div>
