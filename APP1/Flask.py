@@ -241,8 +241,8 @@ def ensure_audio_format(input_file, output_file=None):
 
         # 構建轉換命令
         command = [
-            # ffmpeg_path,
-            "ffmpeg",
+            ffmpeg_path,
+            #"ffmpeg",
             '-i', input_file,
             '-ar', '16000',        # 采樣率 16kHz
             '-ac', '1',            # 單聲道
@@ -278,8 +278,8 @@ async def process_with_timeout(func, audio_data, timeout):
         print(f"Function exceeded {timeout} seconds. Terminating...")  
         # await another_function()
 
-# 雅婷語音轉文字模組
-def yating_api(file_path):
+# 雅婷語音轉文字模組(語者分離)
+async def yating_api(file_path):
     """
     使用語音轉文字模塊來處理音頻文件，將音頻文件轉換為文本。
     """
@@ -314,23 +314,6 @@ def yating_api(file_path):
         if api_key == "" or None:
             raise FileNotFoundError(f"金鑰為空！")
 
-    # transcript = []
-    # def on_processing_sentence(message):
-    #     print(f'hello: {message["asr_sentence"]}')
-
-    # def on_final_sentence(message):
-    #     transcript.append(message["asr_sentence"])
-    #     #print(f'world: {message["asr_sentence"]}')
-        
-    # asr_client = StreamingClient(key=api_key)
-
-    # # 開始語音轉文字處理
-    # asr_client.start_streaming_wav(
-    #     pipeline='asr-zh-tw-std',
-    #     file=file_path,
-    #     #on_processing_sentence=on_processing_sentence,
-    #     on_final_sentence=on_final_sentence
-    # )
     fileName = file_path
     headers = {'key': api_key}
     files = {'file': open(fileName, 'rb')}
@@ -344,7 +327,7 @@ def yating_api(file_path):
     transcript = asyncio.get_event_loop().create_task(_convert(audio, transcript, api_key))
     return transcript
 
-# 雅婷即時語音轉文字模組
+# 雅婷語音轉文字模組(即時)
 def yating_runtime_api(file_path):
     # 獲取金鑰檔案
     current_dir = os.getcwd()
@@ -385,7 +368,7 @@ def transcribe_audio(file_path):
 
     if transcript is None:
         # 如果第一個模塊超時，則使用第二個模塊
-        transcript = asyncio.run(process_with_timeout(yating_runtime_api, file_path, timeout=60))
+        transcript = yating_runtime_api(file_path)
         transcribeMode = 1
 
     # 如果兩個模塊都失敗，返回錯誤
@@ -565,7 +548,7 @@ def fetchContent(name, month):
         conn = sqlite3.connect(DATABASE)
         cursor = conn.cursor()
         timestamp = datetime.now()
-
+#測試機器人(方太太)
         query = "SELECT name, type, content, timestamp FROM GPT_ClassificationResults WHERE name = ? AND strftime('%Y-%m', timestamp) = ? ORDER BY timestamp"
         formatted_timestamp = month
         cursor.execute(query, (name, formatted_timestamp))
