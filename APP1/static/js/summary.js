@@ -188,13 +188,13 @@ function generateSummary(name, month){
         });
 }
 
-function submitForm() {
+async function submitForm() {
     const monthList = document.getElementById('monthList');
     const selectedMonth = monthList.options[monthList.selectedIndex];
     const name = document.getElementById('toggleHeader').textContent.trim();
     if (selectedMonth && selectedMonth.value) {
         console.log('Submitting form for month:', selectedMonth.textContent);
-        generateSummary(name, selectedMonth.textContent);
+        await generateSummary(name, selectedMonth.textContent);
         fetchSummaryContent();
 
     } else {

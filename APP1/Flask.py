@@ -484,13 +484,13 @@ def generateSummaryContent():
     # 從請求參數中獲取 person
     person = request.args.get('person')  # 取得人名參數
     month = request.args.get('month')  # 取得月份參數
-    fetchContent(person, month)
-
-    content_data = []  # 初始化 content_data 變數為空列表
     try:
         if not person:
             return jsonify({'error': 'Missing required parameters: person or type'}), 400
+        
+        fetchContent(person, month)
 
+        content_data = []  # 初始化 content_data 變數為空列表
         # 連接資料庫
         conn = sqlite3.connect(DATABASE)
         cursor = conn.cursor()
@@ -550,17 +550,24 @@ def fetchContent(name):
     
 def fetchContent(name, month):
     try:
+        print(f"生成{name}的{month}月總結報告")
         conn = sqlite3.connect(DATABASE)
         cursor = conn.cursor()
-        timestamp = datetime.now()
-#測試機器人(方太太)
+        timestamp = datetime.strptime(month, '%Y-%m')
         query = "SELECT name, type, content, timestamp FROM GPT_ClassificationResults WHERE name = ? AND strftime('%Y-%m', timestamp) = ? ORDER BY timestamp"
-        formatted_timestamp = month
-        cursor.execute(query, (name, formatted_timestamp))
+        cursor.execute(query, (name, month))
+        #cursor.execute(query, ("{name}", "{month}"))
         rows = cursor.fetchall()
         transcripts = [{'user': row[0], 'type': row[1], 'content': row[2], 'timestamp': row[3]} for row in rows]
+        #print(transcripts)
+        if not transcripts:
+            print("No transcripts found")
+
         unique_dates = sorted([date for date in {datetime.strptime(transcript["timestamp"], "%Y-%m-%d %H:%M:%S").date() for transcript in transcripts}])
         unique_types = {transcript["type"] for transcript in transcripts}
+        #print("Unique dates:", unique_dates)
+        #print("Unique types:", unique_types)
+
         chatContent = "{}\n".format(name)
         for type in unique_types:
             chatContent += "{}\n".format(type)
@@ -568,8 +575,10 @@ def fetchContent(name, month):
                 chatContent += "{}\n".format(date)
                 isContent = False
                 for transcript in transcripts:
-                    if transcript["type"] == type and datetime.strptime(transcript["timestamp"], "%Y-%m-%d %H:%M:%S").date() == date and datetime.strptime(transcript["timestamp"], "%Y-%m-%d %H:%M:%S").date().month == timestamp.month:
+                    if transcript["type"] == type and \
+                    datetime.strptime(transcript["timestamp"], "%Y-%m-%d %H:%M:%S").date() == date:
                         if transcript["content"] != None:
+                            #print("Content found:", transcript["content"])
                             chatContent += "{}\n".format(transcript["content"])
                             isContent = True
                 if isContent == False:
@@ -582,6 +591,7 @@ def fetchContent(name, month):
         print(e)
         app.logger.error(f"Error occurred while fetching content: {e}")
         return "Internal Server Error", 500
+    
 # @app.route('/category/<category_type>', methods=['GET'])
 # def classify_Togo(category_type):
 #     # 假設我們根據 URL 參數中的分類類型來獲取分類內容
